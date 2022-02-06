@@ -1,0 +1,11 @@
+de/timesnake/extension/special/chat/Plugin.class
+de/timesnake/extension/special/move/MoveManager.class
+de/timesnake/extension/special/display/DisplayManager.class
+de/timesnake/extension/special/display/DisplayCmd.class
+de/timesnake/extension/special/move/MoveManager$1.class
+de/timesnake/extension/special/move/MoveManager$MoveType.class
+de/timesnake/extension/special/move/JumpPad.class
+de/timesnake/extension/special/display/Display.class
+de/timesnake/extension/special/move/MoveCmd.class
+de/timesnake/extension/special/move/Portal.class
+de/timesnake/extension/special/main/ExSpecial.class
