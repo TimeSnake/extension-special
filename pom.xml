@@ -56,6 +56,19 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>de.timesnake</groupId>
+            <artifactId>library-packets</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.timesnake</groupId>
+            <artifactId>library-entities</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!--Paper API-->
         <dependency>
@@ -86,18 +99,6 @@
             <artifactId>adventure-api</artifactId>
             <version>4.9.3</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.timesnake</groupId>
-            <artifactId>basic-packets</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.timesnake</groupId>
-            <artifactId>basic-entities</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
