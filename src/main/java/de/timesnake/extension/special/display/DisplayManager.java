@@ -11,9 +11,7 @@ import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DisplayManager {
 
@@ -46,14 +44,18 @@ public class DisplayManager {
 
             HoloDisplayManager displayManager = Server.getHoloDisplayManager();
 
+            LinkedList<Integer> loadedDisplays = new LinkedList<>();
+
             for (Integer id : file.getPathIntegerList(DISPLAYS)) {
                 try {
                     displayManager.addHoloDisplay(new Display(file, id), true);
-                    Server.printText(Plugin.SPECIAL, "Loaded display " + id);
+                    loadedDisplays.add(id);
                 } catch (WorldNotExistException e) {
                     Server.printWarning(Plugin.SPECIAL, "Can not load display with id " + id + " in world " + world.getName());
                 }
             }
+
+            Server.printText(Plugin.SPECIAL, "Loaded displays: " + Arrays.toString(loadedDisplays.toArray()));
         }
 
         Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"), new DisplayCmd(), Plugin.SPECIAL);

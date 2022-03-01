@@ -65,6 +65,8 @@ public class MoveManager implements Listener {
 
         for (Map.Entry<ExWorld, ExFile> entry : this.getMoveFilesByWorld().entrySet()) {
 
+            LinkedList<Integer> loadedMovers = new LinkedList<>();
+
             ExWorld world = entry.getKey();
             ExFile file = entry.getValue();
 
@@ -88,7 +90,7 @@ public class MoveManager implements Listener {
                     case PORTAL:
                         try {
                             portals.add(new Portal(file, id));
-                            Server.printText(Plugin.SPECIAL, "Loaded portal " + id);
+                            loadedMovers.add(id);
                         } catch (WorldNotExistException e) {
                             Server.printWarning(Plugin.SPECIAL, "Can not load portal with id " + id + " in world " + world.getName());
                         }
@@ -96,13 +98,15 @@ public class MoveManager implements Listener {
                     case JUMP_PAD:
                         try {
                             jumpPads.add(new JumpPad(file, id));
-                            Server.printText(Plugin.SPECIAL, "Loaded jump_pad " + id);
+                            loadedMovers.add(id);
                         } catch (WorldNotExistException e) {
-                            e.printStackTrace();
+                            Server.printWarning(Plugin.SPECIAL, "Can not load jump-pad with id " + id + " in world " + world.getName());
                         }
                         break;
                 }
             }
+
+            Server.printText(Plugin.SPECIAL, "Loaded movers in world " + world.getName() + ": " + Arrays.toString(loadedMovers.toArray()));
         }
 
         Server.registerListener(this, ExSpecial.getPlugin());
