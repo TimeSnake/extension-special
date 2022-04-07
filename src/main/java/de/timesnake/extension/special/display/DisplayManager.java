@@ -9,9 +9,13 @@ import de.timesnake.basic.bukkit.util.world.HoloDisplay;
 import de.timesnake.basic.bukkit.util.world.HoloDisplayManager;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
+import de.timesnake.library.extension.util.chat.Chat;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class DisplayManager {
 
@@ -51,11 +55,15 @@ public class DisplayManager {
                     displayManager.addHoloDisplay(new Display(file, id), true);
                     loadedDisplays.add(id);
                 } catch (WorldNotExistException e) {
-                    Server.printWarning(Plugin.SPECIAL, "Can not load display with id " + id + " in world " + world.getName());
+                    Server.printWarning(Plugin.SPECIAL,
+                            "Can not load display with id " + id + " in world " + world.getName());
                 }
             }
 
-            Server.printText(Plugin.SPECIAL, "Loaded displays: " + Arrays.toString(loadedDisplays.toArray()));
+            if (loadedDisplays.size() > 0) {
+                Server.printText(Plugin.SPECIAL, "Loaded displays: " + Chat.listToString(loadedDisplays) + " in world" +
+                        " " + world.getName());
+            }
         }
 
         Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"), new DisplayCmd(), Plugin.SPECIAL);
