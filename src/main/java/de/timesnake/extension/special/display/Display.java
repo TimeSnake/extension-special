@@ -28,8 +28,8 @@ public class Display extends HoloDisplay {
 
         this.id = id;
 
-        file.setLocation(DisplayManager.getDisplayPath(id) + "." + LOCATION, this.getLocation(), false);
-        file.set(DisplayManager.getDisplayPath(id) + "." + TEXT, this.getText());
+        file.setLocation(DisplayManager.getDisplayPath(id) + "." + LOCATION, this.getLocation(), false).save();
+        file.set(DisplayManager.getDisplayPath(id) + "." + TEXT, this.getText()).save();
     }
 
     public Display(ExFile file, int id) throws WorldNotExistException {

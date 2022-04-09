@@ -3,10 +3,9 @@ package de.timesnake.extension.special.move;
 import de.timesnake.basic.bukkit.util.exceptions.WorldNotExistException;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
+import de.timesnake.basic.bukkit.util.world.ExWorld;
 
-import java.util.Set;
-
-public class JumpPad {
+public class JumpPad extends Mover {
 
     public static final String LOCATION = "location";
     public static final String SPEED = "speed";
@@ -15,47 +14,44 @@ public class JumpPad {
     public static final String Y = "y";
     public static final String Z = "z";
 
-
-    private final int id;
-
     private final ExLocation location;
     private final double speed;
     private final double x;
     private final double y;
     private final double z;
 
-    public JumpPad(ExLocation location, double speed, double x, double y, double z, ExFile file) {
+    public JumpPad(MoverManager<JumpPad> manager, ExLocation location, double speed, double x, double y, double z) {
+        super(manager, location.getExWorld());
+
         this.location = location;
         this.speed = speed;
         this.x = x;
         this.y = y;
         this.z = z;
 
-        Set<Integer> ids = file.getPathIntegerList(MoveManager.MOVERS);
+        ExFile file = this.getFile();
 
-        int id = 0;
-
-        while (ids.contains(id)) {
-            id++;
-        }
-
-        this.id = id;
-
-        file.set(MoveManager.getMoverPath(id) + "." + MoveManager.TYPE, MoveManager.MoveType.JUMP_PAD.name().toLowerCase());
-        file.setLocation(MoveManager.getMoverPath(id) + "." + LOCATION, this.getLocation(), false);
-        file.set(MoveManager.getMoverPath(id) + "." + DIRECTION + "." + X, this.getX());
-        file.set(MoveManager.getMoverPath(id) + "." + DIRECTION + "." + Y, this.getY());
-        file.set(MoveManager.getMoverPath(id) + "." + DIRECTION + "." + Z, this.getZ());
-        file.set(MoveManager.getMoverPath(id) + "." + SPEED, this.getSpeed());
+        file.set(MoversManager.getMoverPath(id) + "." + MoversManager.TYPE, JumpPadManager.NAME);
+        file.setLocation(MoversManager.getMoverPath(id) + "." + LOCATION, this.getLocation(), false);
+        file.set(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + X, this.getX());
+        file.set(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + Y, this.getY());
+        file.set(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + Z, this.getZ());
+        file.set(MoversManager.getMoverPath(id) + "." + SPEED, this.getSpeed());
+        file.save();
     }
 
-    public JumpPad(ExFile file, int id) throws WorldNotExistException {
-        this.id = id;
-        this.location = ExLocation.fromLocation(file.getLocation(MoveManager.getMoverPath(id) + "." + LOCATION)).middleBlock();
-        this.speed = file.getDouble(MoveManager.getMoverPath(id) + "." + SPEED);
-        this.x = file.getDouble(MoveManager.getMoverPath(id) + "." + DIRECTION + "." + X);
-        this.y = file.getDouble(MoveManager.getMoverPath(id) + "." + DIRECTION + "." + Y);
-        this.z = file.getDouble(MoveManager.getMoverPath(id) + "." + DIRECTION + "." + Z);
+    public JumpPad(MoverManager<JumpPad> manager, int id, ExWorld world) throws WorldNotExistException {
+        super(manager, id, world);
+
+        ExFile file = this.getFile();
+
+        this.location =
+                ExLocation.fromLocation(file.getLocation(MoversManager.getMoverPath(id) + "." + LOCATION)).middleBlock();
+        this.speed = file.getDouble(MoversManager.getMoverPath(id) + "." + SPEED);
+        this.x = file.getDouble(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + X);
+        this.y = file.getDouble(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + Y);
+        this.z = file.getDouble(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + Z);
+        file.save();
     }
 
 
@@ -83,7 +79,8 @@ public class JumpPad {
         return z;
     }
 
+    @Override
     public boolean removeFromFile(ExFile file) {
-        return file.remove(MoveManager.getMoverPath(this.id));
+        return file.remove(MoversManager.getMoverPath(this.id));
     }
 }
