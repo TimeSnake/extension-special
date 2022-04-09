@@ -1,7 +1,7 @@
 package de.timesnake.extension.special.main;
 
 import de.timesnake.extension.special.display.DisplayManager;
-import de.timesnake.extension.special.move.MoveManager;
+import de.timesnake.extension.special.move.MoversManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ExSpecial extends JavaPlugin {
@@ -12,7 +12,7 @@ public class ExSpecial extends JavaPlugin {
     public void onEnable() {
         plugin = this;
 
-        new MoveManager();
+        new MoversManager();
         new DisplayManager();
     }
 

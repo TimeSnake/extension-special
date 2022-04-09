@@ -70,12 +70,16 @@ public class DisplayCmd implements CommandListener {
 
     @Override
     public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
-        if (args.length() == 0) {
+        if (args.length() == 1) {
             return List.of("add", "remove");
         }
-        if (args.length() == 1) {
-            return List.of("<line1>{\\n<nextLine>}");
-        }
+
+        if (args.length() == 2)
+            if (args.getString(0).equalsIgnoreCase("add")) {
+                return List.of("<text>", "<line1>{\\n<nextLine>}");
+            } else if (args.getString(0).equalsIgnoreCase("remove")) {
+                return List.of("[id]");
+            }
         return List.of();
     }
 }
