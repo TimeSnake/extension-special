@@ -124,7 +124,7 @@ public class PortalManager extends MoverManager<Portal> {
         }
 
         portal = portals.stream().filter(p -> p.getWorld().equals(loc.getExWorld())
-                && p.getFirst().distanceSquared(loc) < RADIUS * RADIUS).findFirst().orElse(null);
+                && p.getSecond().distanceSquared(loc) < RADIUS * RADIUS).findFirst().orElse(null);
 
         if (portal != null) {
             user.teleport(portal.getFirst());
