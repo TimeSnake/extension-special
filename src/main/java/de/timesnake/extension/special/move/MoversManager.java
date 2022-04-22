@@ -11,20 +11,23 @@ import de.timesnake.basic.bukkit.util.user.event.UserMoveEvent;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
+import de.timesnake.library.extension.util.chat.Chat;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class MoversManager implements Listener {
 
     public static final String FILE_NAME = "movers";
 
     public static final String MOVERS = "movers";
-    public static final String TYPE = "type";
 
     private static MoversManager instance;
     private final Map<ExWorld, ExFile> moversFilesByWorld = new HashMap<>();
@@ -56,26 +59,27 @@ public class MoversManager implements Listener {
             ExWorld world = entry.getKey();
             ExFile file = entry.getValue();
 
-            for (Integer id : file.getPathIntegerList(MOVERS)) {
-                String type = file.getString(getMoverPath(id) + "." + TYPE);
+            for (String type : file.getPathStringList(MOVERS)) {
+                MoverManager<?> moverManager = this.moverManagersByName.get(type);
 
                 if (type == null) {
                     continue;
                 }
 
-                MoverManager<?> moverManager = this.moverManagersByName.get(type);
-
-                try {
-                    moverManager.addMover(file, id, world);
-                    loadedMovers.add(id);
-                } catch (WorldNotExistException e) {
-                    Server.printWarning(Plugin.SPECIAL,
-                            "Can not load portal with id " + id + " in world " + world.getName());
+                for (Integer id : file.getPathIntegerList(ExFile.toPath(MOVERS, type))) {
+                    try {
+                        moverManager.addMover(file, id, world);
+                        loadedMovers.add(id);
+                    } catch (WorldNotExistException e) {
+                        Server.printWarning(Plugin.SPECIAL,
+                                "Can not load portal with id " + id + " in world " + world.getName());
+                    }
                 }
             }
 
+
             Server.printText(Plugin.SPECIAL,
-                    "Loaded movers in world " + world.getName() + ": " + Arrays.toString(loadedMovers.toArray()));
+                    "Loaded movers in world " + world.getName() + ": " + Chat.listToString(loadedMovers));
         }
 
         Server.registerListener(this, ExSpecial.getPlugin());
@@ -88,8 +92,8 @@ public class MoversManager implements Listener {
         return instance;
     }
 
-    public static String getMoverPath(int id) {
-        return MOVERS + "." + id;
+    public static String getMoverPath(String type, int id) {
+        return ExFile.toPath(MOVERS, type, String.valueOf(id));
     }
 
     public boolean handleCommand(Sender sender, User user, String type, Arguments<Argument> args) {

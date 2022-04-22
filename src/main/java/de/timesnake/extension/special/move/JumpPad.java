@@ -31,12 +31,12 @@ public class JumpPad extends Mover {
 
         ExFile file = this.getFile();
 
-        file.set(MoversManager.getMoverPath(id) + "." + MoversManager.TYPE, JumpPadManager.NAME);
-        file.setLocation(MoversManager.getMoverPath(id) + "." + LOCATION, this.getLocation(), false);
-        file.set(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + X, this.getX());
-        file.set(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + Y, this.getY());
-        file.set(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + Z, this.getZ());
-        file.set(MoversManager.getMoverPath(id) + "." + SPEED, this.getSpeed());
+        file.setLocation(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + LOCATION, this.getLocation(),
+                false);
+        file.set(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + DIRECTION + "." + X, this.getX());
+        file.set(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + DIRECTION + "." + Y, this.getY());
+        file.set(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + DIRECTION + "." + Z, this.getZ());
+        file.set(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + SPEED, this.getSpeed());
         file.save();
     }
 
@@ -46,11 +46,11 @@ public class JumpPad extends Mover {
         ExFile file = this.getFile();
 
         this.location =
-                ExLocation.fromLocation(file.getLocation(MoversManager.getMoverPath(id) + "." + LOCATION)).middleBlock();
-        this.speed = file.getDouble(MoversManager.getMoverPath(id) + "." + SPEED);
-        this.x = file.getDouble(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + X);
-        this.y = file.getDouble(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + Y);
-        this.z = file.getDouble(MoversManager.getMoverPath(id) + "." + DIRECTION + "." + Z);
+                ExLocation.fromLocation(file.getLocation(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + LOCATION)).middleBlock();
+        this.speed = file.getDouble(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + SPEED);
+        this.x = file.getDouble(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + DIRECTION + "." + X);
+        this.y = file.getDouble(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + DIRECTION + "." + Y);
+        this.z = file.getDouble(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + DIRECTION + "." + Z);
         file.save();
     }
 
@@ -81,6 +81,6 @@ public class JumpPad extends Mover {
 
     @Override
     public boolean removeFromFile(ExFile file) {
-        return file.remove(MoversManager.getMoverPath(this.id));
+        return file.remove(MoversManager.getMoverPath(JumpPadManager.NAME, this.id));
     }
 }

@@ -9,7 +9,6 @@ import java.util.TreeSet;
 public class Elevator extends Mover {
 
     private static final String LOCATION = "base";
-    private static final String WORLD = "world";
     private static final String X = "x";
     private static final String Z = "z";
     private static final String HEIGHTS = "heights";
@@ -27,9 +26,10 @@ public class Elevator extends Mover {
 
         ExFile file = this.getFile();
 
-        file.set(ExFile.toPath(MoversManager.getMoverPath(id), MoversManager.TYPE), ElevatorManager.NAME).save();
-        file.set(ExFile.toPath(MoversManager.getMoverPath(id), LOCATION, X), this.x).save();
-        file.set(ExFile.toPath(MoversManager.getMoverPath(id), LOCATION, Z), this.z).save();
+        file.set(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id), LOCATION, X), this.x);
+        file.set(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id), LOCATION, Z), this.z);
+
+        file.save();
     }
 
     public Elevator(MoverManager<Elevator> manager, int id, ExWorld world) {
@@ -37,17 +37,19 @@ public class Elevator extends Mover {
 
         ExFile file = this.getFile();
 
-        this.x = file.getDouble(ExFile.toPath(MoversManager.getMoverPath(id), LOCATION, X));
-        this.z = file.getDouble(ExFile.toPath(MoversManager.getMoverPath(id), LOCATION, Z));
+        this.x = file.getDouble(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id), LOCATION, X));
+        this.z = file.getDouble(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id), LOCATION, Z));
 
-        this.heights.addAll(file.getIntegerList(ExFile.toPath(MoversManager.getMoverPath(id), HEIGHTS)));
+        this.heights.addAll(file.getIntegerList(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id),
+                HEIGHTS)));
     }
 
     public boolean addLevel(int height) {
         boolean b = this.heights.add(height);
 
         if (b) {
-            this.getFile().set(ExFile.toPath(MoversManager.getMoverPath(id), HEIGHTS), new ArrayList<>(this.heights)).save();
+            this.getFile().set(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id), HEIGHTS),
+                    new ArrayList<>(this.heights)).save();
         }
 
         return b;
@@ -57,7 +59,7 @@ public class Elevator extends Mover {
         boolean b = this.heights.remove(height);
 
         if (b) {
-            this.getFile().set(ExFile.toPath(MoversManager.getMoverPath(id), HEIGHTS), new ArrayList<>(this.heights)).save();
+            this.getFile().set(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id), HEIGHTS), new ArrayList<>(this.heights)).save();
         }
 
         return b;
@@ -85,6 +87,6 @@ public class Elevator extends Mover {
 
     @Override
     public boolean removeFromFile(ExFile file) {
-        return file.remove(MoversManager.getMoverPath(this.id));
+        return file.remove(MoversManager.getMoverPath(ElevatorManager.NAME, this.id));
     }
 }
