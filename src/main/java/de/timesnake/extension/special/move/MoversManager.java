@@ -77,7 +77,6 @@ public class MoversManager implements Listener {
                 }
             }
 
-
             Server.printText(Plugin.SPECIAL,
                     "Loaded movers in world " + world.getName() + ": " + Chat.listToString(loadedMovers));
         }

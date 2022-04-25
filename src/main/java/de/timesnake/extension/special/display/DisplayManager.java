@@ -101,7 +101,8 @@ public class DisplayManager {
             return null;
         }
 
-        ExFile file = this.displayFilesByWorld.computeIfAbsent(loc.getExWorld(), (w) -> new ExFile(loc.getExWorld().getWorldFolder(), FILE_NAME + ".yml"));
+        ExFile file = this.displayFilesByWorld.computeIfAbsent(loc.getExWorld(),
+                (w) -> new ExFile(loc.getExWorld().getWorldFolder(), FILE_NAME + ".yml"));
 
         display.removeFromFile(file);
 
@@ -124,7 +125,8 @@ public class DisplayManager {
             return false;
         }
 
-        ExFile file = this.displayFilesByWorld.computeIfAbsent(world, (w) -> new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
+        ExFile file = this.displayFilesByWorld.computeIfAbsent(world,
+                (w) -> new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
 
         display.removeFromFile(file);
 
