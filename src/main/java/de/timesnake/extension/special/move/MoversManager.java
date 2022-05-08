@@ -72,7 +72,7 @@ public class MoversManager implements Listener {
                         loadedMovers.add(id);
                     } catch (WorldNotExistException e) {
                         Server.printWarning(Plugin.SPECIAL,
-                                "Can not load portal with id " + id + " in world " + world.getName());
+                                "Can not load " + type + " with id " + id + " in world " + world.getName());
                     }
                 }
             }

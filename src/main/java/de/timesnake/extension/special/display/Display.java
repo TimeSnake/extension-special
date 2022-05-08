@@ -3,7 +3,7 @@ package de.timesnake.extension.special.display;
 import de.timesnake.basic.bukkit.util.exceptions.WorldNotExistException;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
-import de.timesnake.basic.bukkit.util.world.HoloDisplay;
+import de.timesnake.basic.bukkit.util.world.entity.HoloDisplay;
 
 import java.util.List;
 import java.util.Set;
