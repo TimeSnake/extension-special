@@ -5,8 +5,8 @@ import de.timesnake.basic.bukkit.util.exceptions.WorldNotExistException;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
-import de.timesnake.basic.bukkit.util.world.HoloDisplay;
-import de.timesnake.basic.bukkit.util.world.HoloDisplayManager;
+import de.timesnake.basic.bukkit.util.world.entity.EntityManager;
+import de.timesnake.basic.bukkit.util.world.entity.HoloDisplay;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
 import de.timesnake.library.extension.util.chat.Chat;
@@ -46,13 +46,14 @@ public class DisplayManager {
             ExWorld world = entry.getKey();
             ExFile file = entry.getValue();
 
-            HoloDisplayManager displayManager = Server.getHoloDisplayManager();
+            EntityManager entityManager = Server.getEntityManager();
 
             LinkedList<Integer> loadedDisplays = new LinkedList<>();
 
             for (Integer id : file.getPathIntegerList(DISPLAYS)) {
                 try {
-                    displayManager.addHoloDisplay(new Display(file, id), true);
+
+                    entityManager.registerEntity(new Display(file, id));
                     loadedDisplays.add(id);
                 } catch (WorldNotExistException e) {
                     Server.printWarning(Plugin.SPECIAL,
@@ -82,7 +83,7 @@ public class DisplayManager {
 
         Display display = new Display(loc, lines, file);
 
-        Server.getHoloDisplayManager().addHoloDisplay(display, true);
+        Server.getEntityManager().registerEntity(display);
 
         return display.getId();
     }
@@ -90,9 +91,9 @@ public class DisplayManager {
     public Integer removeDisplay(ExLocation loc, double range) {
         Display display = null;
 
-        for (HoloDisplay holoDisplay : Server.getHoloDisplayManager().getHoloDisplays(loc.getExWorld())) {
-            if (holoDisplay.getLocation().distance(loc) <= range && holoDisplay instanceof Display) {
-                display = (Display) holoDisplay;
+        for (Display holoDisplay : Server.getEntityManager().getEntitiesByWorld(loc.getExWorld(), Display.class)) {
+            if (holoDisplay.getLocation().distance(loc) <= range) {
+                display = holoDisplay;
                 break;
             }
         }
@@ -106,7 +107,7 @@ public class DisplayManager {
 
         display.removeFromFile(file);
 
-        Server.getHoloDisplayManager().removeHoloDisplay(display);
+        Server.getEntityManager().unregisterEntity(display);
 
         return display.getId();
     }
@@ -114,7 +115,7 @@ public class DisplayManager {
     public boolean removeDisplay(ExWorld world, Integer id) {
         Display display = null;
 
-        for (HoloDisplay holoDisplay : Server.getHoloDisplayManager().getHoloDisplays(world)) {
+        for (HoloDisplay holoDisplay : Server.getEntityManager().getEntitiesByWorld(world, HoloDisplay.class)) {
             if (holoDisplay instanceof Display && ((Display) holoDisplay).getId() == id) {
                 display = (Display) holoDisplay;
                 break;
@@ -130,7 +131,7 @@ public class DisplayManager {
 
         display.removeFromFile(file);
 
-        Server.getHoloDisplayManager().removeHoloDisplay(display);
+        Server.getEntityManager().registerEntity(display);
 
         return true;
     }
