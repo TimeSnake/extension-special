@@ -59,7 +59,8 @@ public class Elevator extends Mover {
         boolean b = this.heights.remove(height);
 
         if (b) {
-            this.getFile().set(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id), HEIGHTS), new ArrayList<>(this.heights)).save();
+            this.getFile().set(ExFile.toPath(MoversManager.getMoverPath(ElevatorManager.NAME, id), HEIGHTS),
+                    new ArrayList<>(this.heights)).save();
         }
 
         return b;

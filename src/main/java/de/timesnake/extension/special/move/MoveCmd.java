@@ -13,7 +13,6 @@ import java.util.List;
 public class MoveCmd implements CommandListener {
 
 
-
     @Override
     public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
         if (!sender.isPlayer(true)) {

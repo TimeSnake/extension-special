@@ -87,7 +87,7 @@ public class JumpPadManager extends MoverManager<JumpPad> {
         if (jumpPads != null) {
             JumpPad jumpPad =
                     this.getJumpPads(location.getExWorld()).stream().filter(p -> p.getWorld().equals(location.getExWorld())
-                    && p.getLocation().distanceSquared(location) < RADIUS * RADIUS).findFirst().orElse(null);
+                            && p.getLocation().distanceSquared(location) < RADIUS * RADIUS).findFirst().orElse(null);
 
             if (jumpPad != null) {
                 double speed = jumpPad.getSpeed();
