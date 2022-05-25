@@ -33,7 +33,8 @@ public class Display extends HoloDisplay {
     }
 
     public Display(ExFile file, int id) throws WorldNotExistException {
-        super(ExLocation.fromLocation(file.getLocation(DisplayManager.getDisplayPath(id) + "." + LOCATION)), file.getStringList(DisplayManager.getDisplayPath(id) + "." + TEXT));
+        super(ExLocation.fromLocation(file.getLocation(DisplayManager.getDisplayPath(id) + "." + LOCATION)),
+                file.getStringList(DisplayManager.getDisplayPath(id) + "." + TEXT));
         this.id = id;
     }
 

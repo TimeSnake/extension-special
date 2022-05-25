@@ -24,11 +24,6 @@ public class DisplayManager {
     public static final String DISPLAYS = "displays";
 
     private static DisplayManager instance;
-
-    public static DisplayManager getInstance() {
-        return instance;
-    }
-
     private final Map<ExWorld, ExFile> displayFilesByWorld = new HashMap<>();
 
     public DisplayManager() {
@@ -67,19 +62,25 @@ public class DisplayManager {
             }
         }
 
-        Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"), new DisplayCmd(), Plugin.SPECIAL);
+        Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"),
+                new DisplayCmd(), Plugin.SPECIAL);
     }
 
-    public Map<ExWorld, ExFile> getDisplayFilesPerWorld() {
-        return this.displayFilesByWorld;
+    public static DisplayManager getInstance() {
+        return instance;
     }
 
     public static String getDisplayPath(int id) {
         return DISPLAYS + "." + id;
     }
 
+    public Map<ExWorld, ExFile> getDisplayFilesPerWorld() {
+        return this.displayFilesByWorld;
+    }
+
     public int addDisplay(ExLocation loc, List<String> lines) {
-        ExFile file = this.displayFilesByWorld.computeIfAbsent(loc.getExWorld(), (w) -> new ExFile(loc.getExWorld().getWorldFolder(), FILE_NAME + ".yml"));
+        ExFile file = this.displayFilesByWorld.computeIfAbsent(loc.getExWorld(),
+                (w) -> new ExFile(loc.getExWorld().getWorldFolder(), FILE_NAME + ".yml"));
 
         Display display = new Display(loc, lines, file);
 
