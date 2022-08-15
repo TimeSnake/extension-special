@@ -1,13 +1,14 @@
 package de.timesnake.extension.special.move;
 
 import de.timesnake.basic.bukkit.util.chat.Argument;
-import de.timesnake.basic.bukkit.util.chat.ChatColor;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
+import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.cmd.Arguments;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 
 import java.util.HashSet;
@@ -125,29 +126,35 @@ public class ElevatorManager extends MoverManager<Elevator> {
 
             if (elevator == null) {
                 elevator = this.addElevator(world, x, z);
-                sender.sendPluginMessage(ChatColor.PERSONAL + "Created elevator " + ChatColor.VALUE + elevator.getId());
+                sender.sendPluginMessage(Component.text("Created elevator ", ExTextColor.PERSONAL)
+                        .append(Component.text(elevator.getId(), ExTextColor.VALUE)));
             }
 
             elevator.addLevel((int) y);
-            sender.sendPluginMessage(ChatColor.PERSONAL + "Added level " + ChatColor.VALUE + ((int) y) +
-                    ChatColor.PERSONAL + " at elevator " + ChatColor.VALUE + elevator.getId());
+            sender.sendPluginMessage(Component.text("Added level ", ExTextColor.PERSONAL)
+                    .append(Component.text((int) y, ExTextColor.VALUE))
+                    .append(Component.text(" at elevator ", ExTextColor.PERSONAL))
+                    .append(Component.text(elevator.getId(), ExTextColor.VALUE)));
 
 
         } else if (action.equalsIgnoreCase("remove")) {
             if (args.isLengthEquals(1, false)) {
                 Integer removedId = this.removeElevator(user.getExLocation(), 2);
                 if (removedId != null) {
-                    sender.sendPluginMessage(ChatColor.PERSONAL + "Removed elevator with id " + ChatColor.VALUE + removedId);
+                    sender.sendPluginMessage(Component.text("Removed elevator with id ", ExTextColor.PERSONAL)
+                            .append(Component.text(removedId, ExTextColor.VALUE)));
                 } else {
-                    sender.sendPluginMessage(ChatColor.WARNING + "No elevator found");
+                    sender.sendPluginMessage(Component.text("No elevator found", ExTextColor.WARNING));
                 }
             } else if (args.get(1).isInt(true)) {
                 Integer removeId = args.get(1).toInt();
                 boolean removed = this.removeElevator(user.getWorld(), removeId);
                 if (removed) {
-                    sender.sendPluginMessage(ChatColor.PERSONAL + "Removed elevator with id " + ChatColor.VALUE + removeId);
+                    sender.sendPluginMessage(Component.text("Removed elevator with id ", ExTextColor.PERSONAL)
+                            .append(Component.text(removeId, ExTextColor.VALUE)));
                 } else {
-                    sender.sendPluginMessage(ChatColor.WARNING + "No elevator with found with id " + ChatColor.PERSONAL + removed);
+                    sender.sendPluginMessage(Component.text("No elevator with found with id ", ExTextColor.WARNING)
+                            .append(Component.text(removed, ExTextColor.VALUE)));
                 }
             } else {
                 sender.sendMessageCommandHelp("Remove elevator", "movers elevator remove [id]");
