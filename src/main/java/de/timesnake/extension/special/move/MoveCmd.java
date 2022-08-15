@@ -4,9 +4,10 @@ import de.timesnake.basic.bukkit.util.chat.Argument;
 import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
-import de.timesnake.library.basic.util.chat.ChatColor;
+import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
+import net.kyori.adventure.text.Component;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class MoveCmd implements CommandListener {
         boolean successfully = MoversManager.getInstance().handleCommand(sender, user, type, args.removeLowerEquals(0));
 
         if (!successfully) {
-            sender.sendPluginMessage(ChatColor.WARNING + "Unknown mover type");
+            sender.sendPluginMessage(Component.text("Unknown mover type", ExTextColor.WARNING));
         }
 
     }

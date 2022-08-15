@@ -1,14 +1,15 @@
 package de.timesnake.extension.special.move;
 
 import de.timesnake.basic.bukkit.util.chat.Argument;
-import de.timesnake.basic.bukkit.util.chat.ChatColor;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.exceptions.WorldNotExistException;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
+import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.cmd.Arguments;
+import net.kyori.adventure.text.Component;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -111,7 +112,8 @@ public class JumpPadManager extends MoverManager<JumpPad> {
 
                     Integer id = this.addJumpPad(user.getExLocation(), vecX, vecY, vecZ, speed);
 
-                    sender.sendPluginMessage(ChatColor.PERSONAL + "Added jump pad with id " + ChatColor.VALUE + id);
+                    sender.sendPluginMessage(Component.text("Added jump pad with id ", ExTextColor.PERSONAL)
+                            .append(Component.text(id, ExTextColor.VALUE)));
                 }
             } else if (args.isLengthEquals(3, true)) {
                 if (args.get(1).isDouble(true) && args.get(2).isDouble(true)) {
@@ -126,7 +128,8 @@ public class JumpPadManager extends MoverManager<JumpPad> {
                     Integer id = this.addJumpPad(user.getExLocation(), vector.getX(), vector.getY(), vector.getZ(),
                             speed);
 
-                    sender.sendPluginMessage(ChatColor.PERSONAL + "Added jump pad with id " + ChatColor.VALUE + id);
+                    sender.sendPluginMessage(Component.text("Added jump pad with id ", ExTextColor.PERSONAL)
+                            .append(Component.text(id, ExTextColor.VALUE)));
                 }
             } else {
                 sender.sendMessageCommandHelp("Create jump pad", "movers jumppad add <dX> <dY> <dZ> <speed>");
@@ -138,17 +141,20 @@ public class JumpPadManager extends MoverManager<JumpPad> {
             if (args.isLengthEquals(1, false)) {
                 Integer removedId = this.removeJumpPad(user.getExLocation(), 2);
                 if (removedId != null) {
-                    sender.sendPluginMessage(ChatColor.PERSONAL + "Removed jump pad with id " + ChatColor.VALUE + removedId);
+                    sender.sendPluginMessage(Component.text("Removed jump pad with id ", ExTextColor.PERSONAL)
+                            .append(Component.text(removedId, ExTextColor.VALUE)));
                 } else {
-                    sender.sendPluginMessage(ChatColor.WARNING + "No jump pad found");
+                    sender.sendPluginMessage(Component.text("No jump pad found", ExTextColor.WARNING));
                 }
             } else if (args.get(1).isInt(true)) {
                 Integer removeId = args.get(1).toInt();
                 boolean removed = this.removeJumpPad(user.getExWorld(), removeId);
                 if (removed) {
-                    sender.sendPluginMessage(ChatColor.PERSONAL + "Removed jump pad with id " + ChatColor.VALUE + removeId);
+                    sender.sendPluginMessage(Component.text("Removed jump pad with id ", ExTextColor.PERSONAL)
+                            .append(Component.text(removeId, ExTextColor.VALUE)));
                 } else {
-                    sender.sendPluginMessage(ChatColor.WARNING + "No jump pad with found with id " + ChatColor.VALUE + removed);
+                    sender.sendPluginMessage(Component.text("No jump pad with found with id ", ExTextColor.WARNING)
+                            .append(Component.text(removed, ExTextColor.VALUE)));
                 }
             } else {
                 sender.sendMessageCommandHelp("Remove jump pad", "movers jumppad remove [id]");

@@ -1,12 +1,13 @@
 package de.timesnake.extension.special.display;
 
 import de.timesnake.basic.bukkit.util.chat.Argument;
-import de.timesnake.basic.bukkit.util.chat.ChatColor;
 import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
+import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
+import net.kyori.adventure.text.Component;
 
 import java.util.List;
 
@@ -41,23 +42,26 @@ public class DisplayCmd implements CommandListener {
                 List<String> lines = List.of(text.split("\\\\n"));
 
                 int id = DisplayManager.getInstance().addDisplay(user.getExLocation(), lines);
-                sender.sendPluginMessage(ChatColor.PERSONAL + "Created display with id " + ChatColor.VALUE + id);
+                sender.sendPluginMessage(Component.text("Created display with id ", ExTextColor.PERSONAL)
+                        .append(Component.text(id, ExTextColor.VALUE)));
                 break;
             case "remove":
                 if (args.isLengthEquals(1, false)) {
                     Integer removedId = DisplayManager.getInstance().removeDisplay(user.getExLocation(), 1);
                     if (removedId != null) {
-                        sender.sendPluginMessage(ChatColor.PERSONAL + "Removed display with id " + ChatColor.VALUE + removedId);
+                        sender.sendPluginMessage(Component.text("Removed display with id ", ExTextColor.PERSONAL)
+                                .append(Component.text(removedId, ExTextColor.VALUE)));
                     } else {
-                        sender.sendPluginMessage(ChatColor.WARNING + "No display found");
+                        sender.sendPluginMessage(Component.text("No display found", ExTextColor.WARNING));
                     }
                 } else if (args.get(1).isInt(true)) {
                     Integer removeId = args.get(1).toInt();
-                    boolean removed = DisplayManager.getInstance().removeDisplay(user.getExWorld(), removeId);
+                    boolean removed = DisplayManager.getInstance().removeDisplay(user.getWorld(), removeId);
                     if (removed) {
-                        sender.sendPluginMessage(ChatColor.PERSONAL + "Removed display with id " + ChatColor.VALUE + removeId);
+                        sender.sendPluginMessage(Component.text("Removed display with id ", ExTextColor.PERSONAL)
+                                .append(Component.text(removeId, ExTextColor.VALUE)));
                     } else {
-                        sender.sendPluginMessage(ChatColor.WARNING + "No display found");
+                        sender.sendPluginMessage(Component.text("No display found", ExTextColor.WARNING));
                     }
                 } else {
                     sender.sendMessageCommandHelp("Remove display", "holod remove [id]");
