@@ -148,7 +148,7 @@ public class ElevatorManager extends MoverManager<Elevator> {
                 }
             } else if (args.get(1).isInt(true)) {
                 Integer removeId = args.get(1).toInt();
-                boolean removed = this.removeElevator(user.getWorld(), removeId);
+                boolean removed = this.removeElevator(user.getExWorld(), removeId);
                 if (removed) {
                     sender.sendPluginMessage(Component.text("Removed elevator with id ", ExTextColor.PERSONAL)
                             .append(Component.text(removeId, ExTextColor.VALUE)));

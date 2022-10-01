@@ -56,7 +56,7 @@ public class DisplayCmd implements CommandListener {
                     }
                 } else if (args.get(1).isInt(true)) {
                     Integer removeId = args.get(1).toInt();
-                    boolean removed = DisplayManager.getInstance().removeDisplay(user.getWorld(), removeId);
+                    boolean removed = DisplayManager.getInstance().removeDisplay(user.getExWorld(), removeId);
                     if (removed) {
                         sender.sendPluginMessage(Component.text("Removed display with id ", ExTextColor.PERSONAL)
                                 .append(Component.text(removeId, ExTextColor.VALUE)));
