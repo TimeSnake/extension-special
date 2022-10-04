@@ -5,6 +5,8 @@ import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.library.basic.util.chat.ExTextColor;
+import de.timesnake.library.extension.util.chat.Code;
+import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
 import net.kyori.adventure.text.Component;
@@ -13,6 +15,7 @@ import java.util.List;
 
 public class MoveCmd implements CommandListener {
 
+    private Code.Permission perm;
 
     @Override
     public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
@@ -20,7 +23,7 @@ public class MoveCmd implements CommandListener {
             return;
         }
 
-        if (!sender.hasPermission("exspecial.movers", 2415)) {
+        if (!sender.hasPermission(this.perm)) {
             return;
         }
 
@@ -49,5 +52,10 @@ public class MoveCmd implements CommandListener {
         String type = args.getString(0);
 
         return MoversManager.getInstance().handleTabComplete(type, args.removeLowerEquals(0));
+    }
+
+    @Override
+    public void loadCodes(Plugin plugin) {
+        this.perm = plugin.createPermssionCode("mov", "exspecial.movers");
     }
 }
