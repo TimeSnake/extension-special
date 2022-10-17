@@ -167,9 +167,9 @@ public class PortalManager extends MoverManager<Portal> {
 
             if (!args.isLengthEquals(3, true) || !args.get(2).isHexColor(true)) {
                 if (isFirst) {
-                    sender.sendMessageCommandHelp("Add first portal", "movers portal first <hexColor>");
+                    sender.sendMessageCommandHelp("Add first portal", "movers portal add first <hexColor>");
                 } else {
-                    sender.sendMessageCommandHelp("Add second portal", "movers portal second <hexColor>");
+                    sender.sendMessageCommandHelp("Add second portal", "movers portal add second <hexColor>");
                 }
                 return;
             }
@@ -178,7 +178,7 @@ public class PortalManager extends MoverManager<Portal> {
                 this.firstPortalByUuid.put(user.getUniqueId(), new Tuple<>(user.getExLocation(),
                         args.get(2).toColorFromHex()));
                 sender.sendPluginMessage(Component.text("Saved first location", ExTextColor.PERSONAL));
-                sender.sendMessageCommandHelp("Add second portal", "movers portal second <hexColor>");
+                sender.sendMessageCommandHelp("Add second portal", "movers portal add second <hexColor>");
             } else if (this.firstPortalByUuid.containsKey(user.getUniqueId())) {
 
                 Tuple<ExLocation, Color> first = this.firstPortalByUuid.remove(user.getUniqueId());
@@ -190,7 +190,7 @@ public class PortalManager extends MoverManager<Portal> {
                 sender.sendPluginMessage(Component.text("Created portal with id ", ExTextColor.PERSONAL)
                         .append(Component.text(id, ExTextColor.VALUE)));
             } else {
-                sender.sendMessageCommandHelp("Create portal", "movers portal first <hexColor>");
+                sender.sendMessageCommandHelp("Create portal", "movers portal add first <hexColor>");
             }
 
         } else if (action.equalsIgnoreCase("remove")) {
@@ -249,6 +249,6 @@ public class PortalManager extends MoverManager<Portal> {
     private void spawnPortalParticles(Location location, Color color) {
         Particle.DustOptions dust = new Particle.DustOptions(color, 2);
         location.getWorld().spawnParticle(Particle.REDSTONE, location.getX(), location.getY(), location.getZ(), 8, 0,
-                1.5, 0, 1, dust);
+                1, 0, 1, dust);
     }
 }
