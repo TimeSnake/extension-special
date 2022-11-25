@@ -1,5 +1,5 @@
 /*
- * extension-special.main
+ * workspace.extension-special.main
  * Copyright (C) 2022 timesnake
  *
  * This program is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 package de.timesnake.extension.special.display;
 
 import de.timesnake.basic.bukkit.util.Server;
-import de.timesnake.basic.bukkit.util.exceptions.WorldNotExistException;
+import de.timesnake.basic.bukkit.util.exception.WorldNotExistException;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
@@ -40,6 +40,14 @@ public class DisplayManager {
     public static final String FILE_NAME = "holo_displays";
 
     public static final String DISPLAYS = "displays";
+
+    public static DisplayManager getInstance() {
+        return instance;
+    }
+
+    public static String getDisplayPath(int id) {
+        return DISPLAYS + "." + id;
+    }
 
     private static DisplayManager instance;
     private final Map<ExWorld, ExFile> displayFilesByWorld = new HashMap<>();
@@ -82,14 +90,6 @@ public class DisplayManager {
 
         Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"),
                 new DisplayCmd(), Plugin.SPECIAL);
-    }
-
-    public static DisplayManager getInstance() {
-        return instance;
-    }
-
-    public static String getDisplayPath(int id) {
-        return DISPLAYS + "." + id;
     }
 
     public Map<ExWorld, ExFile> getDisplayFilesPerWorld() {
