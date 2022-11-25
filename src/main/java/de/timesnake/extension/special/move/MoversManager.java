@@ -1,5 +1,5 @@
 /*
- * extension-special.main
+ * workspace.extension-special.main
  * Copyright (C) 2022 timesnake
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@ import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.chat.Argument;
 import de.timesnake.basic.bukkit.util.chat.Sender;
-import de.timesnake.basic.bukkit.util.exceptions.WorldNotExistException;
+import de.timesnake.basic.bukkit.util.exception.WorldNotExistException;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.user.event.UserMoveEvent;
@@ -46,6 +46,14 @@ public class MoversManager implements Listener {
     public static final String FILE_NAME = "movers";
 
     public static final String MOVERS = "movers";
+
+    public static MoversManager getInstance() {
+        return instance;
+    }
+
+    public static String getMoverPath(String type, int id) {
+        return ExFile.toPath(MOVERS, type, String.valueOf(id));
+    }
 
     private static MoversManager instance;
     private final Map<ExWorld, ExFile> moversFilesByWorld = new HashMap<>();
@@ -103,14 +111,6 @@ public class MoversManager implements Listener {
 
         Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "movers", List.of("mvs", "mover"), new MoveCmd()
                 , Plugin.SPECIAL);
-    }
-
-    public static MoversManager getInstance() {
-        return instance;
-    }
-
-    public static String getMoverPath(String type, int id) {
-        return ExFile.toPath(MOVERS, type, String.valueOf(id));
     }
 
     public boolean handleCommand(Sender sender, User user, String type, Arguments<Argument> args) {
