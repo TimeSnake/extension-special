@@ -14,17 +14,17 @@ import de.timesnake.library.extension.util.chat.Code;
 import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
-import net.kyori.adventure.text.Component;
-
 import java.util.LinkedList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 
 public class MoveCmd implements CommandListener {
 
-    private Code.Permission perm;
+    private Code perm;
 
     @Override
-    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         if (!sender.isPlayer(true)) {
             return;
         }
@@ -45,7 +45,8 @@ public class MoveCmd implements CommandListener {
         argsCopy.removeFirst();
         CommandManager.Arguments shortArgs = new CommandManager.Arguments(sender, argsCopy);
 
-        boolean successfully = MoversManager.getInstance().handleCommand(sender, user, type, shortArgs);
+        boolean successfully = MoversManager.getInstance()
+                .handleCommand(sender, user, type, shortArgs);
 
         if (!successfully) {
             sender.sendPluginMessage(Component.text("Unknown mover type", ExTextColor.WARNING));
@@ -54,7 +55,8 @@ public class MoveCmd implements CommandListener {
     }
 
     @Override
-    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         if (args.length() == 1) {
             return List.of("portal", "jump_pad", "elevator");
         }
@@ -70,6 +72,6 @@ public class MoveCmd implements CommandListener {
 
     @Override
     public void loadCodes(Plugin plugin) {
-        this.perm = plugin.createPermssionCode("mov", "exspecial.movers");
+        this.perm = plugin.createPermssionCode("exspecial.movers");
     }
 }
