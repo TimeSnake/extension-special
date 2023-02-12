@@ -8,7 +8,7 @@ import de.timesnake.basic.bukkit.util.chat.Argument;
 import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
-import de.timesnake.library.basic.util.chat.ExTextColor;
+import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.extension.util.chat.Code;
 import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
@@ -79,11 +79,11 @@ public class DisplayCmd implements CommandListener {
                                 Component.text("No display found", ExTextColor.WARNING));
                     }
                 } else {
-                    sender.sendMessageCommandHelp("Remove display", "holod remove [id]");
+                    sender.sendTDMessageCommandHelp("Remove display", "holod remove [id]");
                 }
                 break;
             default:
-                sender.sendMessageCommandHelp("Create display", "holod add <text>");
+                sender.sendTDMessageCommandHelp("Create display", "holod add <text>");
         }
     }
 

@@ -14,7 +14,7 @@ import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.extension.special.main.ExSpecial;
 import de.timesnake.library.basic.util.Tuple;
-import de.timesnake.library.basic.util.chat.ExTextColor;
+import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -160,10 +160,10 @@ public class PortalManager extends MoverManager<Portal> {
 
             if (!args.isLengthEquals(3, true) || !args.get(2).isHexColor(true)) {
                 if (isFirst) {
-                    sender.sendMessageCommandHelp("Add first portal",
+                    sender.sendTDMessageCommandHelp("Add first portal",
                             "movers portal add first <hexColor>");
                 } else {
-                    sender.sendMessageCommandHelp("Add second portal",
+                    sender.sendTDMessageCommandHelp("Add second portal",
                             "movers portal add second <hexColor>");
                 }
                 return;
@@ -174,7 +174,7 @@ public class PortalManager extends MoverManager<Portal> {
                         args.get(2).toColorFromHex()));
                 sender.sendPluginMessage(
                         Component.text("Saved first location", ExTextColor.PERSONAL));
-                sender.sendMessageCommandHelp("Add second portal",
+                sender.sendTDMessageCommandHelp("Add second portal",
                         "movers portal add second <hexColor>");
             } else if (this.firstPortalByUuid.containsKey(user.getUniqueId())) {
 
@@ -188,7 +188,7 @@ public class PortalManager extends MoverManager<Portal> {
                         Component.text("Created portal with id ", ExTextColor.PERSONAL)
                                 .append(Component.text(id, ExTextColor.VALUE)));
             } else {
-                sender.sendMessageCommandHelp("Create portal",
+                sender.sendTDMessageCommandHelp("Create portal",
                         "movers portal add first <hexColor>");
             }
 
@@ -216,12 +216,12 @@ public class PortalManager extends MoverManager<Portal> {
                                     .append(Component.text(removed, ExTextColor.VALUE)));
                 }
             } else {
-                sender.sendMessageCommandHelp("Remove portal", "movers portal remove [id]");
+                sender.sendTDMessageCommandHelp("Remove portal", "movers portal remove [id]");
             }
         } else {
-            sender.sendMessageCommandHelp("Create portal",
+            sender.sendTDMessageCommandHelp("Create portal",
                     "movers portal add <first/second> <hexColor>");
-            sender.sendMessageCommandHelp("Remove portal", "movers portal remove [id]");
+            sender.sendTDMessageCommandHelp("Remove portal", "movers portal remove [id]");
         }
     }
 
