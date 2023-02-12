@@ -10,14 +10,13 @@ import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
-import de.timesnake.library.basic.util.chat.ExTextColor;
+import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.extension.util.cmd.Arguments;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Location;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
 
 public class ElevatorManager extends MoverManager<Elevator> {
 
@@ -36,7 +35,8 @@ public class ElevatorManager extends MoverManager<Elevator> {
     }
 
     public boolean removeElevator(ExWorld world, Integer id) {
-        Elevator elevator = this.getElevators(world).stream().filter(e -> e.getId() == id).findFirst().orElse(null);
+        Elevator elevator = this.getElevators(world).stream().filter(e -> e.getId() == id)
+                .findFirst().orElse(null);
 
         if (elevator == null) {
             return false;
@@ -125,7 +125,8 @@ public class ElevatorManager extends MoverManager<Elevator> {
             double z = location.getZ();
 
             Elevator elevator = this.getElevators(location.getExWorld()).stream().filter(e ->
-                    location.getExWorld().equals(e.getWorld()) && Math.abs(e.getX() - x) <= RADIUS &&
+                    location.getExWorld().equals(e.getWorld()) && Math.abs(e.getX() - x) <= RADIUS
+                            &&
                             Math.abs(e.getZ() - z) <= RADIUS).findFirst().orElse(null);
 
             if (elevator == null) {
@@ -145,27 +146,31 @@ public class ElevatorManager extends MoverManager<Elevator> {
             if (args.isLengthEquals(1, false)) {
                 Integer removedId = this.removeElevator(user.getExLocation(), 2);
                 if (removedId != null) {
-                    sender.sendPluginMessage(Component.text("Removed elevator with id ", ExTextColor.PERSONAL)
-                            .append(Component.text(removedId, ExTextColor.VALUE)));
+                    sender.sendPluginMessage(
+                            Component.text("Removed elevator with id ", ExTextColor.PERSONAL)
+                                    .append(Component.text(removedId, ExTextColor.VALUE)));
                 } else {
-                    sender.sendPluginMessage(Component.text("No elevator found", ExTextColor.WARNING));
+                    sender.sendPluginMessage(
+                            Component.text("No elevator found", ExTextColor.WARNING));
                 }
             } else if (args.get(1).isInt(true)) {
                 Integer removeId = args.get(1).toInt();
                 boolean removed = this.removeElevator(user.getExWorld(), removeId);
                 if (removed) {
-                    sender.sendPluginMessage(Component.text("Removed elevator with id ", ExTextColor.PERSONAL)
-                            .append(Component.text(removeId, ExTextColor.VALUE)));
+                    sender.sendPluginMessage(
+                            Component.text("Removed elevator with id ", ExTextColor.PERSONAL)
+                                    .append(Component.text(removeId, ExTextColor.VALUE)));
                 } else {
-                    sender.sendPluginMessage(Component.text("No elevator with found with id ", ExTextColor.WARNING)
-                            .append(Component.text(removed, ExTextColor.VALUE)));
+                    sender.sendPluginMessage(
+                            Component.text("No elevator with found with id ", ExTextColor.WARNING)
+                                    .append(Component.text(removed, ExTextColor.VALUE)));
                 }
             } else {
-                sender.sendMessageCommandHelp("Remove elevator", "movers elevator remove [id]");
+                sender.sendTDMessageCommandHelp("Remove elevator", "movers elevator remove [id]");
             }
         } else {
-            sender.sendMessageCommandHelp("Create elevator", "movers elevator add");
-            sender.sendMessageCommandHelp("Remove elevator", "movers elevator remove [id]");
+            sender.sendTDMessageCommandHelp("Create elevator", "movers elevator add");
+            sender.sendTDMessageCommandHelp("Remove elevator", "movers elevator remove [id]");
         }
     }
 
