@@ -15,17 +15,17 @@ import de.timesnake.basic.bukkit.util.user.event.UserMoveEvent;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
+import de.timesnake.library.basic.util.Loggers;
 import de.timesnake.library.extension.util.chat.Chat;
 import de.timesnake.library.extension.util.cmd.Arguments;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 public class MoversManager implements Listener {
 
@@ -58,9 +58,11 @@ public class MoversManager implements Listener {
         this.moverManagersByName.put(elevatorManager.getName(), elevatorManager);
 
         for (ExWorld world : Server.getWorlds()) {
-            File gameFile = new File(world.getWorldFolder().getAbsolutePath() + File.separator + FILE_NAME + ".yml");
+            File gameFile = new File(
+                    world.getWorldFolder().getAbsolutePath() + File.separator + FILE_NAME + ".yml");
             if (gameFile.exists()) {
-                this.moversFilesByWorld.put(world, new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
+                this.moversFilesByWorld.put(world,
+                        new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
             }
         }
 
@@ -83,20 +85,22 @@ public class MoversManager implements Listener {
                         moverManager.addMover(file, id, world);
                         loadedMovers.add(id);
                     } catch (WorldNotExistException e) {
-                        Server.printWarning(Plugin.SPECIAL,
-                                "Can not load " + type + " with id " + id + " in world " + world.getName());
+                        Loggers.SYSTEM.warning(
+                                "Can not load " + type + " with id " + id + " in world "
+                                        + world.getName());
                     }
                 }
             }
 
-            Server.printText(Plugin.SPECIAL,
-                    "Loaded movers in world " + world.getName() + ": " + Chat.listToString(loadedMovers));
+            Loggers.SYSTEM.warning("Loaded movers in world " + world.getName() + ": "
+                    + Chat.listToString(loadedMovers));
         }
 
         Server.registerListener(this, ExSpecial.getPlugin());
 
-        Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "movers", List.of("mvs", "mover"), new MoveCmd()
-                , Plugin.SPECIAL);
+        Server.getCommandManager()
+                .addCommand(ExSpecial.getPlugin(), "movers", List.of("mvs", "mover"), new MoveCmd()
+                        , Plugin.SPECIAL);
     }
 
     public boolean handleCommand(Sender sender, User user, String type, Arguments<Argument> args) {
@@ -125,8 +129,9 @@ public class MoversManager implements Listener {
     }
 
     public ExFile getMoveFile(ExWorld world) {
-        return this.moversFilesByWorld.computeIfAbsent(world, (w) -> new ExFile(world.getWorldFolder(), FILE_NAME +
-                ".yml"));
+        return this.moversFilesByWorld.computeIfAbsent(world,
+                (w) -> new ExFile(world.getWorldFolder(), FILE_NAME +
+                        ".yml"));
     }
 
     @EventHandler

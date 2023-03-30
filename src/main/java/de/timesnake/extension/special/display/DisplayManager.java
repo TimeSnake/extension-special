@@ -13,8 +13,8 @@ import de.timesnake.basic.bukkit.util.world.entity.EntityManager;
 import de.timesnake.basic.bukkit.util.world.entity.HoloDisplay;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
+import de.timesnake.library.basic.util.Loggers;
 import de.timesnake.library.extension.util.chat.Chat;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -42,9 +42,11 @@ public class DisplayManager {
         instance = this;
 
         for (ExWorld world : Server.getWorlds()) {
-            File gameFile = new File(world.getWorldFolder().getAbsolutePath() + File.separator + FILE_NAME + ".yml");
+            File gameFile = new File(
+                    world.getWorldFolder().getAbsolutePath() + File.separator + FILE_NAME + ".yml");
             if (gameFile.exists()) {
-                this.displayFilesByWorld.put(world, new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
+                this.displayFilesByWorld.put(world,
+                        new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
             }
         }
 
@@ -63,19 +65,21 @@ public class DisplayManager {
                     entityManager.registerEntity(new Display(file, id));
                     loadedDisplays.add(id);
                 } catch (WorldNotExistException e) {
-                    Server.printWarning(Plugin.SPECIAL,
+                    Loggers.SYSTEM.warning(
                             "Can not load display with id " + id + " in world " + world.getName());
                 }
             }
 
             if (loadedDisplays.size() > 0) {
-                Server.printText(Plugin.SPECIAL, "Loaded displays: " + Chat.listToString(loadedDisplays) + " in world" +
-                        " " + world.getName());
+                Loggers.SYSTEM.warning(
+                        "Loaded displays: " + Chat.listToString(loadedDisplays) + " in world" +
+                                " " + world.getName());
             }
         }
 
-        Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"),
-                new DisplayCmd(), Plugin.SPECIAL);
+        Server.getCommandManager()
+                .addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"),
+                        new DisplayCmd(), Plugin.SPECIAL);
     }
 
     public Map<ExWorld, ExFile> getDisplayFilesPerWorld() {
@@ -96,7 +100,8 @@ public class DisplayManager {
     public Integer removeDisplay(ExLocation loc, double range) {
         Display display = null;
 
-        for (Display holoDisplay : Server.getEntityManager().getEntitiesByWorld(loc.getExWorld(), Display.class)) {
+        for (Display holoDisplay : Server.getEntityManager()
+                .getEntitiesByWorld(loc.getExWorld(), Display.class)) {
             if (holoDisplay.getLocation().distance(loc) <= range) {
                 display = holoDisplay;
                 break;
@@ -120,7 +125,8 @@ public class DisplayManager {
     public boolean removeDisplay(ExWorld world, Integer id) {
         Display display = null;
 
-        for (HoloDisplay holoDisplay : Server.getEntityManager().getEntitiesByWorld(world, HoloDisplay.class)) {
+        for (HoloDisplay holoDisplay : Server.getEntityManager()
+                .getEntitiesByWorld(world, HoloDisplay.class)) {
             if (holoDisplay instanceof Display && ((Display) holoDisplay).getId() == id) {
                 display = (Display) holoDisplay;
                 break;
