@@ -40,21 +40,19 @@ public class DisplayCmd implements CommandListener {
         String action = args.getString(0).toLowerCase();
 
         switch (action) {
-            case "add":
+            case "add" -> {
                 if (!args.isLengthHigherEquals(2, true)) {
                     return;
                 }
-
                 String text = args.toMessage(1);
                 text = text.replaceAll("\\\\&", "§");
                 List<String> lines = List.of(text.split("\\\\n"));
-
                 int id = DisplayManager.getInstance().addDisplay(user.getExLocation(), lines);
                 sender.sendPluginMessage(
                         Component.text("Created display with id ", ExTextColor.PERSONAL)
                                 .append(Component.text(id, ExTextColor.VALUE)));
-                break;
-            case "remove":
+            }
+            case "remove" -> {
                 if (args.isLengthEquals(1, false)) {
                     Integer removedId = DisplayManager.getInstance()
                             .removeDisplay(user.getExLocation(), 1);
@@ -81,9 +79,8 @@ public class DisplayCmd implements CommandListener {
                 } else {
                     sender.sendTDMessageCommandHelp("Remove display", "holod remove [id]");
                 }
-                break;
-            default:
-                sender.sendTDMessageCommandHelp("Create display", "holod add <text>");
+            }
+            default -> sender.sendTDMessageCommandHelp("Create display", "holod add <text>");
         }
     }
 
