@@ -10,17 +10,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ExSpecial extends JavaPlugin {
 
-    private static ExSpecial plugin;
+  private static ExSpecial plugin;
 
-    @Override
-    public void onEnable() {
-        plugin = this;
+  @Override
+  public void onEnable() {
+    plugin = this;
 
-        new MoversManager();
-        new DisplayManager();
-    }
+    new MoversManager();
+    new DisplayManager();
+  }
 
-    public static ExSpecial getPlugin() {
-        return plugin;
-    }
+  public static ExSpecial getPlugin() {
+    return plugin;
+  }
 }

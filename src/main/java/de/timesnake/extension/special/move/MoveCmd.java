@@ -20,58 +20,58 @@ import net.kyori.adventure.text.Component;
 
 public class MoveCmd implements CommandListener {
 
-    private Code perm;
+  private Code perm;
 
-    @Override
-    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
-            Arguments<Argument> args) {
-        if (!sender.isPlayer(true)) {
-            return;
-        }
-
-        if (!sender.hasPermission(this.perm)) {
-            return;
-        }
-
-        User user = sender.getUser();
-
-        if (!args.isLengthHigherEquals(2, true)) {
-            return;
-        }
-
-        String type = args.getString(0).toLowerCase();
-
-        LinkedList<Argument> argsCopy = args.getAll();
-        argsCopy.removeFirst();
-        CommandManager.Arguments shortArgs = new CommandManager.Arguments(sender, argsCopy);
-
-        boolean successfully = MoversManager.getInstance()
-                .handleCommand(sender, user, type, shortArgs);
-
-        if (!successfully) {
-            sender.sendPluginMessage(Component.text("Unknown mover type", ExTextColor.WARNING));
-        }
-
+  @Override
+  public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+      Arguments<Argument> args) {
+    if (!sender.isPlayer(true)) {
+      return;
     }
 
-    @Override
-    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
-            Arguments<Argument> args) {
-        if (args.length() == 1) {
-            return List.of("portal", "jump_pad", "elevator");
-        }
-
-        String type = args.getString(0);
-
-        LinkedList<Argument> argsCopy = args.getAll();
-        argsCopy.removeFirst();
-        CommandManager.Arguments shortArgs = new CommandManager.Arguments(argsCopy);
-
-        return MoversManager.getInstance().handleTabComplete(type, shortArgs);
+    if (!sender.hasPermission(this.perm)) {
+      return;
     }
 
-    @Override
-    public void loadCodes(Plugin plugin) {
-        this.perm = plugin.createPermssionCode("exspecial.movers");
+    User user = sender.getUser();
+
+    if (!args.isLengthHigherEquals(2, true)) {
+      return;
     }
+
+    String type = args.getString(0).toLowerCase();
+
+    LinkedList<Argument> argsCopy = args.getAll();
+    argsCopy.removeFirst();
+    CommandManager.Arguments shortArgs = new CommandManager.Arguments(sender, argsCopy);
+
+    boolean successfully = MoversManager.getInstance()
+        .handleCommand(sender, user, type, shortArgs);
+
+    if (!successfully) {
+      sender.sendPluginMessage(Component.text("Unknown mover type", ExTextColor.WARNING));
+    }
+
+  }
+
+  @Override
+  public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
+      Arguments<Argument> args) {
+    if (args.length() == 1) {
+      return List.of("portal", "jump_pad", "elevator");
+    }
+
+    String type = args.getString(0);
+
+    LinkedList<Argument> argsCopy = args.getAll();
+    argsCopy.removeFirst();
+    CommandManager.Arguments shortArgs = new CommandManager.Arguments(argsCopy);
+
+    return MoversManager.getInstance().handleTabComplete(type, shortArgs);
+  }
+
+  @Override
+  public void loadCodes(Plugin plugin) {
+    this.perm = plugin.createPermssionCode("exspecial.movers");
+  }
 }

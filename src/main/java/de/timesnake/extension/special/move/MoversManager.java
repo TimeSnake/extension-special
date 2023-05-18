@@ -29,137 +29,137 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 public class MoversManager implements Listener {
 
-    public static final String FILE_NAME = "movers";
+  public static final String FILE_NAME = "movers";
 
-    public static final String MOVERS = "movers";
+  public static final String MOVERS = "movers";
 
-    public static MoversManager getInstance() {
-        return instance;
+  public static MoversManager getInstance() {
+    return instance;
+  }
+
+  public static String getMoverPath(String type, int id) {
+    return ExFile.toPath(MOVERS, type, String.valueOf(id));
+  }
+
+  private static MoversManager instance;
+  private final Map<ExWorld, ExFile> moversFilesByWorld = new HashMap<>();
+  private final HashMap<String, MoverManager<?>> moverManagersByName = new HashMap<>();
+
+  public MoversManager() {
+    instance = this;
+
+    PortalManager portalManager = new PortalManager();
+    this.moverManagersByName.put(portalManager.getName(), portalManager);
+
+    JumpPadManager jumpPadManager = new JumpPadManager();
+    this.moverManagersByName.put(jumpPadManager.getName(), jumpPadManager);
+
+    ElevatorManager elevatorManager = new ElevatorManager();
+    this.moverManagersByName.put(elevatorManager.getName(), elevatorManager);
+
+    for (ExWorld world : Server.getWorlds()) {
+      File gameFile = new File(
+          world.getWorldFolder().getAbsolutePath() + File.separator + FILE_NAME + ".yml");
+      if (gameFile.exists()) {
+        this.moversFilesByWorld.put(world,
+            new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
+      }
     }
 
-    public static String getMoverPath(String type, int id) {
-        return ExFile.toPath(MOVERS, type, String.valueOf(id));
-    }
+    for (Map.Entry<ExWorld, ExFile> entry : this.getMoversFilesByWorld().entrySet()) {
 
-    private static MoversManager instance;
-    private final Map<ExWorld, ExFile> moversFilesByWorld = new HashMap<>();
-    private final HashMap<String, MoverManager<?>> moverManagersByName = new HashMap<>();
+      LinkedList<Integer> loadedMovers = new LinkedList<>();
 
-    public MoversManager() {
-        instance = this;
+      ExWorld world = entry.getKey();
+      ExFile file = entry.getValue();
 
-        PortalManager portalManager = new PortalManager();
-        this.moverManagersByName.put(portalManager.getName(), portalManager);
+      for (String type : file.getPathStringList(MOVERS)) {
+        MoverManager<?> moverManager = this.moverManagersByName.get(type);
 
-        JumpPadManager jumpPadManager = new JumpPadManager();
-        this.moverManagersByName.put(jumpPadManager.getName(), jumpPadManager);
-
-        ElevatorManager elevatorManager = new ElevatorManager();
-        this.moverManagersByName.put(elevatorManager.getName(), elevatorManager);
-
-        for (ExWorld world : Server.getWorlds()) {
-            File gameFile = new File(
-                    world.getWorldFolder().getAbsolutePath() + File.separator + FILE_NAME + ".yml");
-            if (gameFile.exists()) {
-                this.moversFilesByWorld.put(world,
-                        new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
-            }
+        if (type == null) {
+          continue;
         }
 
-        for (Map.Entry<ExWorld, ExFile> entry : this.getMoversFilesByWorld().entrySet()) {
-
-            LinkedList<Integer> loadedMovers = new LinkedList<>();
-
-            ExWorld world = entry.getKey();
-            ExFile file = entry.getValue();
-
-            for (String type : file.getPathStringList(MOVERS)) {
-                MoverManager<?> moverManager = this.moverManagersByName.get(type);
-
-                if (type == null) {
-                    continue;
-                }
-
-                for (Integer id : file.getPathIntegerList(ExFile.toPath(MOVERS, type))) {
-                    try {
-                        moverManager.addMover(file, id, world);
-                        loadedMovers.add(id);
-                    } catch (WorldNotExistException e) {
-                        Loggers.SYSTEM.warning(
-                                "Can not load " + type + " with id " + id + " in world "
-                                        + world.getName());
-                    }
-                }
-            }
-
-            Loggers.SYSTEM.warning("Loaded movers in world " + world.getName() + ": "
-                    + Chat.listToString(loadedMovers));
+        for (Integer id : file.getPathIntegerList(ExFile.toPath(MOVERS, type))) {
+          try {
+            moverManager.addMover(file, id, world);
+            loadedMovers.add(id);
+          } catch (WorldNotExistException e) {
+            Loggers.SYSTEM.warning(
+                "Can not load " + type + " with id " + id + " in world "
+                    + world.getName());
+          }
         }
+      }
 
-        Server.registerListener(this, ExSpecial.getPlugin());
-
-        Server.getCommandManager()
-                .addCommand(ExSpecial.getPlugin(), "movers", List.of("mvs", "mover"), new MoveCmd()
-                        , Plugin.SPECIAL);
+      Loggers.SYSTEM.warning("Loaded movers in world " + world.getName() + ": "
+          + Chat.listToString(loadedMovers));
     }
 
-    public boolean handleCommand(Sender sender, User user, String type, Arguments<Argument> args) {
-        MoverManager<?> moverManager = this.moverManagersByName.get(type.toLowerCase());
+    Server.registerListener(this, ExSpecial.getPlugin());
 
-        if (moverManager == null) {
-            return false;
-        }
+    Server.getCommandManager()
+        .addCommand(ExSpecial.getPlugin(), "movers", List.of("mvs", "mover"), new MoveCmd()
+            , Plugin.SPECIAL);
+  }
 
-        moverManager.handleCommand(sender, user, args);
-        return true;
+  public boolean handleCommand(Sender sender, User user, String type, Arguments<Argument> args) {
+    MoverManager<?> moverManager = this.moverManagersByName.get(type.toLowerCase());
+
+    if (moverManager == null) {
+      return false;
     }
 
-    public List<String> handleTabComplete(String type, Arguments<Argument> args) {
-        MoverManager<?> moverManager = this.moverManagersByName.get(type.toLowerCase());
+    moverManager.handleCommand(sender, user, args);
+    return true;
+  }
 
-        if (moverManager == null) {
-            return List.of();
-        }
+  public List<String> handleTabComplete(String type, Arguments<Argument> args) {
+    MoverManager<?> moverManager = this.moverManagersByName.get(type.toLowerCase());
 
-        return moverManager.handleTabComplete(args);
+    if (moverManager == null) {
+      return List.of();
     }
 
-    public Map<ExWorld, ExFile> getMoversFilesByWorld() {
-        return moversFilesByWorld;
+    return moverManager.handleTabComplete(args);
+  }
+
+  public Map<ExWorld, ExFile> getMoversFilesByWorld() {
+    return moversFilesByWorld;
+  }
+
+  public ExFile getMoveFile(ExWorld world) {
+    return this.moversFilesByWorld.computeIfAbsent(world,
+        (w) -> new ExFile(world.getWorldFolder(), FILE_NAME +
+            ".yml"));
+  }
+
+  @EventHandler
+  public void onUserMove(UserMoveEvent e) {
+
+    User user = e.getUser();
+
+    for (MoverManager<?> moverManager : this.moverManagersByName.values()) {
+      moverManager.trigger(user, MoverManager.Trigger.MOVE);
     }
+  }
 
-    public ExFile getMoveFile(ExWorld world) {
-        return this.moversFilesByWorld.computeIfAbsent(world,
-                (w) -> new ExFile(world.getWorldFolder(), FILE_NAME +
-                        ".yml"));
+  @EventHandler
+  public void onPlayerSneak(PlayerToggleSneakEvent e) {
+    User user = Server.getUser(e.getPlayer());
+
+    for (MoverManager<?> moverManager : this.moverManagersByName.values()) {
+      moverManager.trigger(user, MoverManager.Trigger.SNEAK);
     }
+  }
 
-    @EventHandler
-    public void onUserMove(UserMoveEvent e) {
+  @EventHandler
+  public void onPlayerJump(PlayerJumpEvent e) {
+    User user = Server.getUser(e.getPlayer());
 
-        User user = e.getUser();
-
-        for (MoverManager<?> moverManager : this.moverManagersByName.values()) {
-            moverManager.trigger(user, MoverManager.Trigger.MOVE);
-        }
+    for (MoverManager<?> moverManager : this.moverManagersByName.values()) {
+      moverManager.trigger(user, MoverManager.Trigger.JUMP);
     }
-
-    @EventHandler
-    public void onPlayerSneak(PlayerToggleSneakEvent e) {
-        User user = Server.getUser(e.getPlayer());
-
-        for (MoverManager<?> moverManager : this.moverManagersByName.values()) {
-            moverManager.trigger(user, MoverManager.Trigger.SNEAK);
-        }
-    }
-
-    @EventHandler
-    public void onPlayerJump(PlayerJumpEvent e) {
-        User user = Server.getUser(e.getPlayer());
-
-        for (MoverManager<?> moverManager : this.moverManagersByName.values()) {
-            moverManager.trigger(user, MoverManager.Trigger.JUMP);
-        }
-    }
+  }
 
 }
