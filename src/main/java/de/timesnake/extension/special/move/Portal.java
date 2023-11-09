@@ -26,8 +26,8 @@ public class Portal extends Mover {
       Color secondColor) {
     super(manager, first.getExWorld());
 
-    this.first = first.middleBlock().roundFacing();
-    this.second = second.middleBlock().roundFacing();
+    this.first = first.middleHorizontalBlock().roundFacing();
+    this.second = second.middleHorizontalBlock().roundFacing();
     this.firstColor = firstColor;
     this.secondColor = secondColor;
 
@@ -53,10 +53,10 @@ public class Portal extends Mover {
 
     this.first =
         file.getExLocation(ExFile.toPath(MoversManager.getMoverPath(PortalManager.NAME, id), FIRST))
-            .middleBlock().roundFacing();
+            .middleHorizontalBlock().roundFacing();
     this.second =
         file.getExLocation(
-                ExFile.toPath(MoversManager.getMoverPath(PortalManager.NAME, id), SECOND)).middleBlock()
+                ExFile.toPath(MoversManager.getMoverPath(PortalManager.NAME, id), SECOND)).middleHorizontalBlock()
             .roundFacing();
 
     Color firstColor = file.getColorFromHex(
