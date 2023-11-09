@@ -58,7 +58,7 @@ public class JumpPad extends Mover {
     this.location =
         ExLocation.fromLocation(
                 file.getLocation(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + LOCATION))
-            .middleBlock();
+            .middleHorizontalBlock();
     this.speed = file.getDouble(MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + SPEED);
     this.x = file.getDouble(
         MoversManager.getMoverPath(JumpPadManager.NAME, id) + "." + DIRECTION + "." + X);
