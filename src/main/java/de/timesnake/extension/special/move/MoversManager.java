@@ -16,16 +16,16 @@ import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
 import de.timesnake.library.basic.util.Loggers;
-import de.timesnake.library.extension.util.chat.Chat;
 import de.timesnake.library.extension.util.cmd.Arguments;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 public class MoversManager implements Listener {
 
@@ -93,7 +93,7 @@ public class MoversManager implements Listener {
       }
 
       Loggers.SYSTEM.warning("Loaded movers in world " + world.getName() + ": "
-          + Chat.listToString(loadedMovers));
+          + String.join(",", loadedMovers.stream().map(String::valueOf).toList()));
     }
 
     Server.registerListener(this, ExSpecial.getPlugin());

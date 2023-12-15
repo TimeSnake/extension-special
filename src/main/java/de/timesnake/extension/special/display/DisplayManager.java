@@ -14,7 +14,7 @@ import de.timesnake.basic.bukkit.util.world.entity.HoloDisplay;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
 import de.timesnake.library.basic.util.Loggers;
-import de.timesnake.library.extension.util.chat.Chat;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -65,20 +65,18 @@ public class DisplayManager {
           entityManager.registerEntity(new Display(file, id));
           loadedDisplays.add(id);
         } catch (WorldNotExistException e) {
-          Loggers.SYSTEM.warning(
-              "Can not load display with id " + id + " in world " + world.getName());
+          Loggers.SYSTEM.warning("Can not load display with id " + id + " in world " + world.getName());
         }
       }
 
-      if (loadedDisplays.size() > 0) {
-        Loggers.SYSTEM.warning(
-            "Loaded displays: " + Chat.listToString(loadedDisplays) + " in world" +
-                " " + world.getName());
+      if (!loadedDisplays.isEmpty()) {
+        Loggers.SYSTEM.warning("Loaded displays: " +
+            String.join(",", loadedDisplays.stream().map(String::valueOf).toList())
+            + " in world " + world.getName());
       }
     }
 
-    Server.getCommandManager()
-        .addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"),
+    Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"),
             new DisplayCmd(), Plugin.SPECIAL);
   }
 
