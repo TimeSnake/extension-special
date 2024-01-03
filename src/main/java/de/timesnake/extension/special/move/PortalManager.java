@@ -5,8 +5,8 @@
 package de.timesnake.extension.special.move;
 
 import de.timesnake.basic.bukkit.util.Server;
-import de.timesnake.basic.bukkit.util.chat.Argument;
-import de.timesnake.basic.bukkit.util.chat.Sender;
+import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
+import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
 import de.timesnake.basic.bukkit.util.exception.WorldNotExistException;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.user.User;
@@ -15,17 +15,14 @@ import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.extension.special.main.ExSpecial;
 import de.timesnake.library.basic.util.Tuple;
 import de.timesnake.library.chat.ExTextColor;
-import de.timesnake.library.extension.util.cmd.Arguments;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import de.timesnake.library.commands.simple.Arguments;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.*;
 
 public class PortalManager extends MoverManager<Portal> {
 

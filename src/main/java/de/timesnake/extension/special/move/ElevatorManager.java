@@ -4,19 +4,20 @@
 
 package de.timesnake.extension.special.move;
 
-import de.timesnake.basic.bukkit.util.chat.Argument;
-import de.timesnake.basic.bukkit.util.chat.Sender;
+import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
+import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
 import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.library.chat.ExTextColor;
-import de.timesnake.library.extension.util.cmd.Arguments;
+import de.timesnake.library.commands.simple.Arguments;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Location;
 
 public class ElevatorManager extends MoverManager<Elevator> {
 
