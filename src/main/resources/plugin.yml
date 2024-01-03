@@ -1,7 +1,7 @@
 main: de.timesnake.extension.special.main.ExSpecial
 version: 1.1
 name: extension-special
-author: Mn
+author: timesnake
 depend: [ basic-bukkit ]
 api-version: 1.13
 
