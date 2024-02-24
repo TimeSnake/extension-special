@@ -13,7 +13,8 @@ import de.timesnake.basic.bukkit.util.world.entity.EntityManager;
 import de.timesnake.basic.bukkit.util.world.entity.HoloDisplay;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
-import de.timesnake.library.basic.util.Loggers;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.HashMap;
@@ -36,6 +37,9 @@ public class DisplayManager {
   }
 
   private static DisplayManager instance;
+
+  private final Logger logger = LogManager.getLogger("server.special.displays");
+
   private final Map<ExWorld, ExFile> displayFilesByWorld = new HashMap<>();
 
   public DisplayManager() {
@@ -65,14 +69,13 @@ public class DisplayManager {
           entityManager.registerEntity(new Display(file, id));
           loadedDisplays.add(id);
         } catch (WorldNotExistException e) {
-          Loggers.SYSTEM.warning("Can not load display with id " + id + " in world " + world.getName());
+          this.logger.warn("Can not load display with id {} in world {}", id, world.getName());
         }
       }
 
       if (!loadedDisplays.isEmpty()) {
-        Loggers.SYSTEM.warning("Loaded displays: " +
-            String.join(",", loadedDisplays.stream().map(String::valueOf).toList())
-            + " in world " + world.getName());
+        this.logger.info("Loaded displays: {} in world {}",
+            String.join(",", loadedDisplays.stream().map(String::valueOf).toList()), world.getName());
       }
     }
 

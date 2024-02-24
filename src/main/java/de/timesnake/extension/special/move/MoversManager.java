@@ -15,8 +15,9 @@ import de.timesnake.basic.bukkit.util.user.event.UserMoveEvent;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
-import de.timesnake.library.basic.util.Loggers;
 import de.timesnake.library.commands.simple.Arguments;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -42,6 +43,9 @@ public class MoversManager implements Listener {
   }
 
   private static MoversManager instance;
+
+  private final Logger logger = LogManager.getLogger("server.special.movers");
+
   private final Map<ExWorld, ExFile> moversFilesByWorld = new HashMap<>();
   private final HashMap<String, MoverManager<?>> moverManagersByName = new HashMap<>();
 
@@ -85,22 +89,19 @@ public class MoversManager implements Listener {
             moverManager.addMover(file, id, world);
             loadedMovers.add(id);
           } catch (WorldNotExistException e) {
-            Loggers.SYSTEM.warning(
-                "Can not load " + type + " with id " + id + " in world "
-                    + world.getName());
+            this.logger.warn("Can not load {} with id {} in world {}", type, id, world.getName());
           }
         }
       }
 
-      Loggers.SYSTEM.warning("Loaded movers in world " + world.getName() + ": "
-          + String.join(",", loadedMovers.stream().map(String::valueOf).toList()));
+      this.logger.warn("Loaded movers in world {}: {}", world.getName(),
+          String.join(",", loadedMovers.stream().map(String::valueOf).toList()));
     }
 
     Server.registerListener(this, ExSpecial.getPlugin());
 
-    Server.getCommandManager()
-        .addCommand(ExSpecial.getPlugin(), "movers", List.of("mvs", "mover"), new MoveCmd()
-            , Plugin.SPECIAL);
+    Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "movers", List.of("mvs", "mover"),
+        new MoveCmd(), Plugin.SPECIAL);
   }
 
   public boolean handleCommand(Sender sender, User user, String type, Arguments<Argument> args) {
