@@ -7,35 +7,24 @@ package de.timesnake.extension.special.move;
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
 import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
-import de.timesnake.basic.bukkit.util.exception.WorldNotExistException;
-import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.extension.special.main.ExSpecial;
 import de.timesnake.library.basic.util.Tuple;
-import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.commands.simple.Arguments;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
 public class PortalManager extends MoverManager<Portal> {
 
   public static final String NAME = "portal";
-
   public static final double RADIUS = 0.9;
-  public static final int DELAY = (int) (0.6 * 20);
-
-  private final HashMap<User, Portal> usedPortalsByUser = new HashMap<>();
 
   private final HashMap<UUID, Tuple<ExLocation, Color>> firstPortalByUuid = new HashMap<>();
-
-  private BukkitTask portalEffectTask;
 
   public PortalManager() {
     super(NAME);
@@ -47,14 +36,13 @@ public class PortalManager extends MoverManager<Portal> {
   }
 
   @Override
-  public void addMover(ExFile file, int id, ExWorld world) throws WorldNotExistException {
-    Portal portal = new Portal(this, id, world);
-    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(portal);
+  public void addMover(Mover mover, ExWorld world) {
+    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(((Portal) mover));
   }
 
-  public Integer addPortal(ExLocation firstLoc, ExLocation secondLoc, Color firstColor,
-      Color secondColor) {
-    Portal portal = new Portal(this, firstLoc, secondLoc, firstColor, secondColor);
+  public Integer addPortal(ExLocation firstLoc, ExLocation secondLoc, Color firstColor, Color secondColor) {
+    Portal portal = new Portal(this, firstLoc.getExWorld(), firstLoc.toFacingPosition(),
+        secondLoc.toFacingPosition(), firstColor, secondColor);
     this.moversByWorld.computeIfAbsent(portal.getWorld(), (w) -> new HashSet<>()).add(portal);
 
     return portal.getId();
@@ -75,31 +63,21 @@ public class PortalManager extends MoverManager<Portal> {
       return false;
     }
 
-    ExFile file = MoversManager.getInstance().getMoveFile(world);
-
-    portal.removeFromFile(file);
-
     this.getPortals(world).remove(portal);
-
     return true;
   }
 
   public Integer removePortal(ExLocation loc, double range) {
     Portal portal = this.getPortals(loc.getExWorld()).stream()
         .filter(p -> p.getWorld().equals(loc.getExWorld())
-            && p.getFirst().distanceSquared(loc) < range * range).findFirst()
+                     && p.getFirst().toLocation(loc.getExWorld()).distanceSquared(loc) < range * range).findFirst()
         .orElse(null);
 
     if (portal == null) {
       return null;
     }
 
-    ExFile file = MoversManager.getInstance().getMoveFile(loc.getExWorld());
-
-    portal.removeFromFile(file);
-
     this.getPortals(loc.getExWorld()).remove(portal);
-
     return portal.getId();
   }
 
@@ -122,23 +100,17 @@ public class PortalManager extends MoverManager<Portal> {
     }
 
     Portal portal = portals.stream().filter(p -> p.getWorld().equals(loc.getExWorld())
-        && p.getFirst().distanceSquared(loc) < RADIUS * RADIUS).findFirst().orElse(null);
+                                                 && p.getFirst().toLocation(loc.getExWorld()).distanceSquared(loc) < RADIUS * RADIUS).findFirst().orElse(null);
 
     if (portal != null) {
-      user.teleport(portal.getSecond());
-      this.usedPortalsByUser.put(user, portal);
-      Server.runTaskLaterSynchrony(() -> this.usedPortalsByUser.remove(user), DELAY,
-          ExSpecial.getPlugin());
+      user.teleport(portal.getSecond().toLocation(loc.getExWorld()));
     }
 
     portal = portals.stream().filter(p -> p.getWorld().equals(loc.getExWorld())
-        && p.getSecond().distanceSquared(loc) < RADIUS * RADIUS).findFirst().orElse(null);
+                                          && p.getSecond().toLocation(loc.getExWorld()).distanceSquared(loc) < RADIUS * RADIUS).findFirst().orElse(null);
 
     if (portal != null) {
-      user.teleport(portal.getFirst());
-      this.usedPortalsByUser.put(user, portal);
-      Server.runTaskLaterSynchrony(() -> this.usedPortalsByUser.remove(user), DELAY,
-          ExSpecial.getPlugin());
+      user.teleport(portal.getFirst().toLocation(loc.getExWorld()));
     }
   }
 
@@ -157,11 +129,9 @@ public class PortalManager extends MoverManager<Portal> {
 
       if (!args.isLengthEquals(3, true) || !args.get(2).isHexColor(true)) {
         if (isFirst) {
-          sender.sendTDMessageCommandHelp("Add first portal",
-              "movers portal add first <hexColor>");
+          sender.sendTDMessageCommandHelp("Add first portal", "movers portal add first <hexColor>");
         } else {
-          sender.sendTDMessageCommandHelp("Add second portal",
-              "movers portal add second <hexColor>");
+          sender.sendTDMessageCommandHelp("Add second portal", "movers portal add second <hexColor>");
         }
         return;
       }
@@ -169,55 +139,41 @@ public class PortalManager extends MoverManager<Portal> {
       if (isFirst) {
         this.firstPortalByUuid.put(user.getUniqueId(), new Tuple<>(user.getExLocation(),
             args.get(2).toColorFromHex()));
-        sender.sendPluginMessage(
-            Component.text("Saved first location", ExTextColor.PERSONAL));
-        sender.sendTDMessageCommandHelp("Add second portal",
-            "movers portal add second <hexColor>");
+        sender.sendPluginTDMessage("§sSaved first location");
+        sender.sendTDMessageCommandHelp("Add second portal", "movers portal add second <hexColor>");
       } else if (this.firstPortalByUuid.containsKey(user.getUniqueId())) {
-
         Tuple<ExLocation, Color> first = this.firstPortalByUuid.remove(user.getUniqueId());
         ExLocation secondLoc = user.getExLocation();
         Color color = args.get(2).toColorFromHex();
 
         Integer id = this.addPortal(first.getA(), secondLoc, first.getB(), color);
 
-        sender.sendPluginMessage(
-            Component.text("Created portal with id ", ExTextColor.PERSONAL)
-                .append(Component.text(id, ExTextColor.VALUE)));
+        sender.sendPluginTDMessage("§sCreated portal with id §v" + id);
       } else {
-        sender.sendTDMessageCommandHelp("Create portal",
-            "movers portal add first <hexColor>");
+        sender.sendTDMessageCommandHelp("Create portal", "movers portal add first <hexColor>");
       }
 
     } else if (action.equalsIgnoreCase("remove")) {
       if (args.isLengthEquals(1, false)) {
         Integer removedId = this.removePortal(user.getExLocation(), 2);
         if (removedId != null) {
-          sender.sendPluginMessage(
-              Component.text("Removed portal with id ", ExTextColor.PERSONAL)
-                  .append(Component.text(removedId, ExTextColor.VALUE)));
+          sender.sendPluginTDMessage("§sRemoved portal with id §v" + removedId);
         } else {
-          sender.sendPluginMessage(
-              Component.text("No portal found", ExTextColor.WARNING));
+          sender.sendPluginTDMessage("§wNo portal found");
         }
       } else if (args.get(1).isInt(true)) {
         Integer removeId = args.get(1).toInt();
         boolean removed = this.removePortal(user.getExWorld(), removeId);
         if (removed) {
-          sender.sendPluginMessage(
-              Component.text("Removed portal with id ", ExTextColor.PERSONAL)
-                  .append(Component.text(removeId, ExTextColor.VALUE)));
+          sender.sendPluginTDMessage("§sRemoved portal with id §v" + removeId);
         } else {
-          sender.sendPluginMessage(
-              Component.text("No portal with found with id ", ExTextColor.WARNING)
-                  .append(Component.text(removed, ExTextColor.VALUE)));
+          sender.sendPluginTDMessage("§wNo portal with found with id §v" + removeId);
         }
       } else {
         sender.sendTDMessageCommandHelp("Remove portal", "movers portal remove [id]");
       }
     } else {
-      sender.sendTDMessageCommandHelp("Create portal",
-          "movers portal add <first/second> <hexColor>");
+      sender.sendTDMessageCommandHelp("Create portal", "movers portal add <first/second> <hexColor>");
       sender.sendTDMessageCommandHelp("Remove portal", "movers portal remove [id]");
     }
   }
@@ -236,21 +192,19 @@ public class PortalManager extends MoverManager<Portal> {
   }
 
   public void startPortalEffects() {
-    this.portalEffectTask = Server.runTaskTimerAsynchrony(() -> {
+    Server.runTaskTimerAsynchrony(() -> {
       for (Set<Portal> portals : this.moversByWorld.values()) {
         for (Portal portal : portals) {
-          this.spawnPortalParticles(portal.getFirst(), portal.getFirstColor());
-          this.spawnPortalParticles(portal.getSecond(), portal.getSecondColor());
+          this.spawnPortalParticles(portal.getFirst().toLocation(portal.getWorld()), portal.getFirstColor());
+          this.spawnPortalParticles(portal.getSecond().toLocation(portal.getWorld()), portal.getSecondColor());
         }
       }
-
     }, 0, 10, ExSpecial.getPlugin());
   }
 
   private void spawnPortalParticles(Location location, Color color) {
     Particle.DustOptions dust = new Particle.DustOptions(color, 2);
-    location.getWorld()
-        .spawnParticle(Particle.REDSTONE, location.getX(), location.getY(), location.getZ(),
-            8, 0, 1, 0, 1, dust);
+    location.getWorld().spawnParticle(Particle.REDSTONE, location.getX(), location.getY(), location.getZ(),
+        8, 0, 1, 0, 1, dust);
   }
 }

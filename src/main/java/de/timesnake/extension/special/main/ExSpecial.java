@@ -12,12 +12,19 @@ public class ExSpecial extends JavaPlugin {
 
   private static ExSpecial plugin;
 
+  private MoversManager moversManager;
+
   @Override
   public void onEnable() {
     plugin = this;
 
-    new MoversManager();
+    this.moversManager = new MoversManager();
     new DisplayManager();
+  }
+
+  @Override
+  public void onDisable() {
+    this.moversManager.onDisable();
   }
 
   public static ExSpecial getPlugin() {

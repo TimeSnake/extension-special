@@ -4,35 +4,20 @@
 
 package de.timesnake.extension.special.move;
 
-import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
-import java.util.List;
+
+import java.util.Objects;
 
 public abstract class Mover {
 
-  protected final MoverManager<?> manager;
-
+  protected final String type;
   protected final int id;
-  protected final ExWorld world;
 
-  public Mover(MoverManager<?> manager, ExWorld world) {
-    this.manager = manager;
-    this.world = world;
+  protected transient ExWorld world;
 
-    List<Integer> ids = this.manager.getIds(this.world);
-
-    int id = 0;
-
-    while (ids.contains(id)) {
-      id++;
-    }
-
-    this.id = id;
-  }
-
-  public Mover(MoverManager<?> manager, int id, ExWorld world) {
-    this.manager = manager;
-    this.id = id;
+  public Mover(MoverManager<?> manager, ExWorld world, String type) {
+    this.type = type;
+    this.id = manager.newId(world);
     this.world = world;
   }
 
@@ -40,14 +25,24 @@ public abstract class Mover {
     return id;
   }
 
-  public ExFile getFile() {
-    return this.manager.getFile(this.world);
-  }
-
   public ExWorld getWorld() {
     return this.world;
   }
 
-  public abstract boolean removeFromFile(ExFile file);
+  public String getType() {
+    return type;
+  }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Mover mover = (Mover) o;
+    return id == mover.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }
