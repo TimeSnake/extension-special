@@ -4,147 +4,154 @@
 
 package de.timesnake.extension.special.display;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import de.timesnake.basic.bukkit.util.Server;
-import de.timesnake.basic.bukkit.util.exception.WorldNotExistException;
-import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
-import de.timesnake.basic.bukkit.util.world.entity.EntityManager;
-import de.timesnake.basic.bukkit.util.world.entity.HoloDisplay;
+import de.timesnake.basic.bukkit.util.world.ExWorldLoadEvent;
 import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
+import de.timesnake.library.basic.util.GsonFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldUnloadEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class DisplayManager {
+public class DisplayManager implements Listener {
 
   public static final String FILE_NAME = "holo_displays";
 
-  public static final String DISPLAYS = "displays";
-
   public static DisplayManager getInstance() {
     return instance;
-  }
-
-  public static String getDisplayPath(int id) {
-    return DISPLAYS + "." + id;
   }
 
   private static DisplayManager instance;
 
   private final Logger logger = LogManager.getLogger("server.special.displays");
 
-  private final Map<ExWorld, ExFile> displayFilesByWorld = new HashMap<>();
+  private final Map<ExWorld, List<Display>> displaysByWorld = new HashMap<>();
 
   public DisplayManager() {
     instance = this;
 
     for (ExWorld world : Server.getWorlds()) {
-      File gameFile = new File(
-          world.getWorldFolder().getAbsolutePath() + File.separator + FILE_NAME + ".yml");
-      if (gameFile.exists()) {
-        this.displayFilesByWorld.put(world,
-            new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
-      }
+      this.loadDisplaysOfWorld(world);
     }
 
-    for (Map.Entry<ExWorld, ExFile> entry : this.getDisplayFilesPerWorld().entrySet()) {
-
-      ExWorld world = entry.getKey();
-      ExFile file = entry.getValue();
-
-      EntityManager entityManager = Server.getEntityManager();
-
-      LinkedList<Integer> loadedDisplays = new LinkedList<>();
-
-      for (Integer id : file.getPathIntegerList(DISPLAYS)) {
-        try {
-
-          entityManager.registerEntity(new Display(file, id));
-          loadedDisplays.add(id);
-        } catch (WorldNotExistException e) {
-          this.logger.warn("Can not load display with id {} in world {}", id, world.getName());
-        }
-      }
-
-      if (!loadedDisplays.isEmpty()) {
-        this.logger.info("Loaded displays: {} in world {}",
-            String.join(",", loadedDisplays.stream().map(String::valueOf).toList()), world.getName());
-      }
-    }
+    Server.registerListener(this, ExSpecial.getPlugin());
 
     Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"),
             new DisplayCmd(), Plugin.SPECIAL);
   }
 
-  public Map<ExWorld, ExFile> getDisplayFilesPerWorld() {
-    return this.displayFilesByWorld;
+  private void loadDisplaysOfWorld(ExWorld world) {
+    File displaysFile = new File(world.getWorldFolder().getAbsolutePath() + File.separator + FILE_NAME + ".json");
+    if (displaysFile.exists()) {
+      GsonFile file = this.newGsonFile(world.getWorldFolder().getAbsolutePath());
+
+      List<Display> displays = file.read(new TypeToken<List<Display>>() {
+      }.getType());
+      this.displaysByWorld.put(world, displays);
+
+      for (Display display : displays) {
+        display.setWorld(world);
+        display.loadEntity();
+      }
+
+      this.logger.info("Loaded displays in world '{}': {}", world.getName(),
+          String.join(",", displays.stream().map(String::valueOf).toList()));
+    }
+  }
+
+  private void saveDisplassOfWorld(ExWorld world) {
+    List<Display> worldDisplays = this.displaysByWorld.remove(world);
+    if (worldDisplays != null && !worldDisplays.isEmpty()) {
+      this.newGsonFile(world.getWorldFolder().getAbsolutePath()).write(worldDisplays);
+    }
   }
 
   public int addDisplay(ExLocation loc, List<String> lines) {
-    ExFile file = this.displayFilesByWorld.computeIfAbsent(loc.getExWorld(),
-        (w) -> new ExFile(loc.getExWorld().getWorldFolder(), FILE_NAME + ".yml"));
+    Display display = new Display(this, loc.getExWorld(), loc.toPosition(), lines);
+    this.displaysByWorld.computeIfAbsent(loc.getExWorld(), k -> new ArrayList<>()).add(display);
 
-    Display display = new Display(loc, lines, file);
-
-    Server.getEntityManager().registerEntity(display);
-
+    Server.getEntityManager().registerEntity(display.getPacketEntity());
     return display.getId();
   }
 
-  public Integer removeDisplay(ExLocation loc, double range) {
-    Display display = null;
+  public List<Integer> getIds(ExWorld world) {
+    return this.displaysByWorld.computeIfAbsent(world, w -> List.of()).stream()
+        .map(Display::getId).collect(Collectors.toList());
+  }
 
-    for (Display holoDisplay : Server.getEntityManager()
-        .getEntitiesByWorld(loc.getExWorld(), Display.class)) {
-      if (holoDisplay.getLocation().distance(loc) <= range) {
-        display = holoDisplay;
-        break;
+  public int newId(ExWorld world) {
+    List<Integer> ids = this.getIds(world);
+
+    int id = 0;
+
+    while (ids.contains(id)) {
+      id++;
+    }
+
+    return id;
+  }
+
+  private GsonFile newGsonFile(String folderPath) {
+    return new GsonFile(new File(folderPath + File.separator + FILE_NAME + ".json"), this.newGson());
+  }
+
+  private Gson newGson() {
+    return new GsonBuilder()
+        .serializeNulls()
+        .setPrettyPrinting()
+        .create();
+  }
+
+  public @Nullable Integer removeDisplay(ExLocation loc, double range) {
+    for (Display display : this.displaysByWorld.getOrDefault(loc.getExWorld(), List.of())) {
+      if (display.getPacketEntity().getLocation().distance(loc) <= range) {
+        this.displaysByWorld.get(loc.getExWorld()).remove(display);
+        Server.getEntityManager().unregisterEntity(display.getPacketEntity());
+        return display.getId();
       }
     }
-
-    if (display == null) {
-      return null;
-    }
-
-    ExFile file = this.displayFilesByWorld.computeIfAbsent(loc.getExWorld(),
-        (w) -> new ExFile(loc.getExWorld().getWorldFolder(), FILE_NAME + ".yml"));
-
-    display.removeFromFile(file);
-
-    Server.getEntityManager().unregisterEntity(display);
-
-    return display.getId();
+    return null;
   }
 
   public boolean removeDisplay(ExWorld world, Integer id) {
-    Display display = null;
-
-    for (HoloDisplay holoDisplay : Server.getEntityManager()
-        .getEntitiesByWorld(world, HoloDisplay.class)) {
-      if (holoDisplay instanceof Display && ((Display) holoDisplay).getId() == id) {
-        display = (Display) holoDisplay;
-        break;
+    for (Display display : this.displaysByWorld.getOrDefault(world, List.of())) {
+      if (display.getId() == id) {
+        this.displaysByWorld.get(world).remove(display);
+        Server.getEntityManager().unregisterEntity(display.getPacketEntity());
+        return true;
       }
     }
 
-    if (display == null) {
-      return false;
+    return false;
+  }
+
+  @EventHandler
+  public void onWorldLoad(ExWorldLoadEvent e) {
+    this.loadDisplaysOfWorld(e.getWorld());
+  }
+
+  @EventHandler
+  public void onWorldUnload(WorldUnloadEvent e) {
+    ExWorld world = Server.getWorld(e.getWorld());
+
+    if (world != null) {
+      this.saveDisplassOfWorld(world);
+      this.logger.info("Saved displays of world '{}'", world.getName());
     }
-
-    ExFile file = this.displayFilesByWorld.computeIfAbsent(world,
-        (w) -> new ExFile(world.getWorldFolder(), FILE_NAME + ".yml"));
-
-    display.removeFromFile(file);
-
-    Server.getEntityManager().registerEntity(display);
-
-    return true;
   }
 }

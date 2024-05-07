@@ -6,14 +6,10 @@ package de.timesnake.extension.special.move;
 
 import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
 import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
-import de.timesnake.basic.bukkit.util.exception.WorldNotExistException;
-import de.timesnake.basic.bukkit.util.file.ExFile;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
-import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.commands.simple.Arguments;
-import net.kyori.adventure.text.Component;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -30,13 +26,12 @@ public class JumpPadManager extends MoverManager<JumpPad> {
   }
 
   @Override
-  public void addMover(ExFile file, int id, ExWorld world) throws WorldNotExistException {
-    JumpPad jumpPad = new JumpPad(this, id, world);
-    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(jumpPad);
+  public void addMover(Mover mover, ExWorld world) {
+    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(((JumpPad) mover));
   }
 
   public Integer addJumpPad(ExLocation loc, double vecX, double vecY, double vecZ, double speed) {
-    JumpPad jumpPad = new JumpPad(this, loc, speed, vecX, vecY, vecZ);
+    JumpPad jumpPad = new JumpPad(this, loc.getExWorld(), loc.toFacingPosition(), speed, vecX, vecY, vecZ);
     this.moversByWorld.computeIfAbsent(jumpPad.getWorld(), (w) -> new HashSet<>()).add(jumpPad);
     return jumpPad.getId();
   }
@@ -44,19 +39,14 @@ public class JumpPadManager extends MoverManager<JumpPad> {
   public Integer removeJumpPad(ExLocation loc, double range) {
     JumpPad jumpPad = this.getJumpPads(loc.getExWorld()).stream()
         .filter(p -> p.getWorld().equals(loc.getExWorld())
-            && p.getLocation().distanceSquared(loc) < range * range).findFirst()
+                     && p.getPosition().toLocation(loc.getExWorld()).distanceSquared(loc) < range * range).findFirst()
         .orElse(null);
 
     if (jumpPad == null) {
       return null;
     }
 
-    ExFile file = MoversManager.getInstance().getMoveFile(loc.getExWorld());
-
-    jumpPad.removeFromFile(file);
-
     this.getJumpPads(loc.getExWorld()).remove(jumpPad);
-
     return jumpPad.getId();
   }
 
@@ -68,12 +58,7 @@ public class JumpPadManager extends MoverManager<JumpPad> {
       return false;
     }
 
-    ExFile file = MoversManager.getInstance().getMoveFile(world);
-
-    jumpPad.removeFromFile(file);
-
     this.getJumpPads(world).remove(jumpPad);
-
     return true;
   }
 
@@ -96,14 +81,12 @@ public class JumpPadManager extends MoverManager<JumpPad> {
       JumpPad jumpPad =
           this.getJumpPads(location.getExWorld()).stream()
               .filter(p -> p.getWorld().equals(location.getExWorld())
-                  && p.getLocation().distanceSquared(location) < RADIUS * RADIUS)
+                           && p.getPosition().toLocation(location.getExWorld()).distanceSquared(location) < RADIUS * RADIUS)
               .findFirst().orElse(null);
 
       if (jumpPad != null) {
         double speed = jumpPad.getSpeed();
-        user.setVelocity(
-            new Vector(jumpPad.getX(), jumpPad.getY(), jumpPad.getZ()).normalize()
-                .multiply(speed));
+        user.setVelocity(new Vector(jumpPad.getX(), jumpPad.getY(), jumpPad.getZ()).normalize().multiply(speed));
       }
     }
   }
@@ -123,9 +106,7 @@ public class JumpPadManager extends MoverManager<JumpPad> {
 
           Integer id = this.addJumpPad(user.getExLocation(), vecX, vecY, vecZ, speed);
 
-          sender.sendPluginMessage(
-              Component.text("Added jump pad with id ", ExTextColor.PERSONAL)
-                  .append(Component.text(id, ExTextColor.VALUE)));
+          sender.sendPluginTDMessage("§sAdded jump pad with id §v" + id);
         }
       } else if (args.isLengthEquals(3, true)) {
         if (args.get(1).isDouble(true) && args.get(2).isDouble(true)) {
@@ -141,49 +122,35 @@ public class JumpPadManager extends MoverManager<JumpPad> {
               vector.getZ(),
               speed);
 
-          sender.sendPluginMessage(
-              Component.text("Added jump pad with id ", ExTextColor.PERSONAL)
-                  .append(Component.text(id, ExTextColor.VALUE)));
+          sender.sendPluginTDMessage("§sAdded jump pad with id " + id);
         }
       } else {
-        sender.sendTDMessageCommandHelp("Create jump pad",
-            "movers jumppad add <dX> <dY> <dZ> <speed>");
-        sender.sendTDMessageCommandHelp("Create jump pad with look direction",
-            "movers jumppad add <height> " +
-                "<speed>");
+        sender.sendTDMessageCommandHelp("Create jump pad", "movers jumppad add <dX> <dY> <dZ> <speed>");
+        sender.sendTDMessageCommandHelp("Create jump pad with look direction", "movers jumppad add <height> <speed>");
       }
 
     } else if (action.equalsIgnoreCase("remove")) {
       if (args.isLengthEquals(1, false)) {
         Integer removedId = this.removeJumpPad(user.getExLocation(), 2);
         if (removedId != null) {
-          sender.sendPluginMessage(
-              Component.text("Removed jump pad with id ", ExTextColor.PERSONAL)
-                  .append(Component.text(removedId, ExTextColor.VALUE)));
+          sender.sendPluginTDMessage("§sRemoved jump pad with id §v" + removedId);
         } else {
-          sender.sendPluginMessage(
-              Component.text("No jump pad found", ExTextColor.WARNING));
+          sender.sendPluginTDMessage("§wNo jump pad found");
         }
       } else if (args.get(1).isInt(true)) {
         Integer removeId = args.get(1).toInt();
         boolean removed = this.removeJumpPad(user.getExWorld(), removeId);
         if (removed) {
-          sender.sendPluginMessage(
-              Component.text("Removed jump pad with id ", ExTextColor.PERSONAL)
-                  .append(Component.text(removeId, ExTextColor.VALUE)));
+          sender.sendPluginTDMessage("§sRemoved jump pad with id §v" + removeId);
         } else {
-          sender.sendPluginMessage(
-              Component.text("No jump pad with found with id ", ExTextColor.WARNING)
-                  .append(Component.text(removed, ExTextColor.VALUE)));
+          sender.sendPluginTDMessage("§wNo jump pad with found with id §v" + removeId);
         }
       } else {
         sender.sendTDMessageCommandHelp("Remove jump pad", "movers jumppad remove [id]");
       }
     } else {
-      sender.sendTDMessageCommandHelp("Create jump pad",
-          "movers jumppad add <dX> <dY> <dZ> <speed>");
-      sender.sendTDMessageCommandHelp("Create jump pad with look direction",
-          "movers jumppad add <height> <speed>");
+      sender.sendTDMessageCommandHelp("Create jump pad", "movers jumppad add <dX> <dY> <dZ> <speed>");
+      sender.sendTDMessageCommandHelp("Create jump pad with look direction", "movers jumppad add <height> <speed>");
       sender.sendTDMessageCommandHelp("Remove jump pad", "movers jumppad remove [id]");
     }
   }

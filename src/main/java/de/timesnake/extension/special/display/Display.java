@@ -4,50 +4,73 @@
 
 package de.timesnake.extension.special.display;
 
-import de.timesnake.basic.bukkit.util.exception.WorldNotExistException;
-import de.timesnake.basic.bukkit.util.file.ExFile;
-import de.timesnake.basic.bukkit.util.world.ExLocation;
+import de.timesnake.basic.bukkit.util.world.ExPosition;
+import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.basic.bukkit.util.world.entity.HoloDisplay;
+import de.timesnake.basic.bukkit.util.world.entity.PacketEntity;
+
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
-public class Display extends HoloDisplay {
-
-  public static final String LOCATION = "location";
-  public static final String TEXT = "text";
+public class Display {
 
   private final int id;
+  private final ExPosition position;
+  private final List<String> text;
 
-  public Display(ExLocation location, List<String> text, ExFile file) {
-    super(location, text);
+  private transient PacketEntity packetEntity;
+  private transient ExWorld world;
 
-    Set<Integer> ids = file.getPathIntegerList(DisplayManager.DISPLAYS);
-
-    int id = 0;
-
-    while (ids.contains(id)) {
-      id++;
-    }
-
-    this.id = id;
-
-    file.setLocation(DisplayManager.getDisplayPath(id) + "." + LOCATION, this.getLocation(), false)
-        .save();
-    file.set(DisplayManager.getDisplayPath(id) + "." + TEXT, this.getText()).save();
-  }
-
-  public Display(ExFile file, int id) throws WorldNotExistException {
-    super(ExLocation.fromLocation(
-            file.getLocation(DisplayManager.getDisplayPath(id) + "." + LOCATION)),
-        file.getStringList(DisplayManager.getDisplayPath(id) + "." + TEXT));
-    this.id = id;
+  public Display(DisplayManager manager, ExWorld world, ExPosition position, List<String> text) {
+    this.id = manager.newId(world);
+    this.position = position;
+    this.text = text;
+    this.world = world;
+    this.loadEntity();
   }
 
   public int getId() {
     return id;
   }
 
-  public boolean removeFromFile(ExFile file) {
-    return file.remove(DisplayManager.getDisplayPath(this.id));
+  public ExPosition getPosition() {
+    return position;
+  }
+
+  public List<String> getText() {
+    return text;
+  }
+
+  public PacketEntity getPacketEntity() {
+    return packetEntity;
+  }
+
+  public void setPacketEntity(PacketEntity packetEntity) {
+    this.packetEntity = packetEntity;
+  }
+
+  public ExWorld getWorld() {
+    return world;
+  }
+
+  void setWorld(ExWorld world) {
+    this.world = world;
+  }
+
+  void loadEntity() {
+    this.packetEntity = new HoloDisplay(position.toLocation(world), this.text);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Display display = (Display) o;
+    return id == display.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 }
