@@ -2,7 +2,7 @@
  * Copyright (C) 2023 timesnake
  */
 
-package de.timesnake.extension.special.move;
+package de.timesnake.extension.special.location_interactions;
 
 import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
 import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ElevatorManager extends MoverManager<Elevator> {
+public class ElevatorManager extends LocationInteractionManagerBasis<Elevator> {
 
   public static final double RADIUS = 0.9;
   public static final String NAME = "elevator";
@@ -43,6 +43,11 @@ public class ElevatorManager extends MoverManager<Elevator> {
     return true;
   }
 
+  @Override
+  public void addLocInteraction(Elevator mover, ExWorld world) {
+    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(mover);
+  }
+
   public Integer removeElevator(ExLocation loc, double range) {
     Elevator elevator = this.getElevators(loc.getExWorld()).stream().filter(e ->
         loc.getExWorld().equals(e.getWorld()) && Math.abs(e.getX() - loc.getX()) <= range &&
@@ -61,7 +66,7 @@ public class ElevatorManager extends MoverManager<Elevator> {
   }
 
   @Override
-  public void trigger(User user, Trigger type) {
+  public LocInteractionResult<?> trigger(User user, Trigger type) {
     ExLocation location = user.getExLocation();
 
     if (type.equals(Trigger.JUMP) || (type.equals(Trigger.SNEAK) && user.isSneaking())) {
@@ -77,25 +82,24 @@ public class ElevatorManager extends MoverManager<Elevator> {
               Integer higher = elevator.higher(location.getBlockY());
 
               if (higher == null) {
-                return;
+                return null;
               }
 
-              user.teleport(location.getX(), higher, location.getZ());
+              return new LocInteractionResult<>(elevator, u -> u.teleport(location.getX(), higher, location.getZ()));
             } else {
               Integer lower = elevator.lower(location.getBlockY());
 
               if (lower == null) {
-                return;
+                return null;
               }
 
-              user.teleport(location.getX(), lower, location.getZ());
+              return new LocInteractionResult<>(elevator, u -> u.teleport(location.getX(), lower, location.getZ()));
             }
-
-            return;
           }
         }
       }
     }
+    return null;
   }
 
   @Override
@@ -155,10 +159,5 @@ public class ElevatorManager extends MoverManager<Elevator> {
       return List.of("add", "remove");
     }
     return List.of();
-  }
-
-  @Override
-  public void addMover(Mover mover, ExWorld world) {
-    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(((Elevator) mover));
   }
 }

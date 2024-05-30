@@ -2,7 +2,7 @@
  * Copyright (C) 2023 timesnake
  */
 
-package de.timesnake.extension.special.move;
+package de.timesnake.extension.special.location_interactions;
 
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
@@ -19,7 +19,7 @@ import org.bukkit.Particle;
 
 import java.util.*;
 
-public class PortalManager extends MoverManager<Portal> {
+public class PortalManager extends LocationInteractionManagerBasis<Portal> {
 
   public static final String NAME = "portal";
   public static final double RADIUS = 0.9;
@@ -36,8 +36,8 @@ public class PortalManager extends MoverManager<Portal> {
   }
 
   @Override
-  public void addMover(Mover mover, ExWorld world) {
-    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(((Portal) mover));
+  public void addLocInteraction(Portal mover, ExWorld world) {
+    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(mover);
   }
 
   public Integer addPortal(ExLocation firstLoc, ExLocation secondLoc, Color firstColor, Color secondColor) {
@@ -82,9 +82,9 @@ public class PortalManager extends MoverManager<Portal> {
   }
 
   @Override
-  public void trigger(User user, Trigger type) {
+  public LocInteractionResult<Portal> trigger(User user, Trigger type) {
     if (!type.equals(Trigger.SNEAK)) {
-      return;
+      return null;
     }
 
     ExLocation loc = user.getExLocation();
@@ -92,26 +92,33 @@ public class PortalManager extends MoverManager<Portal> {
     Set<Portal> portals = this.moversByWorld.get(user.getExWorld());
 
     if (portals == null) {
-      return;
+      return null;
     }
 
     if (!user.getPlayer().isSneaking()) {
-      return;
+      return null;
     }
 
-    Portal portal = portals.stream().filter(p -> p.getWorld().equals(loc.getExWorld())
-                                                 && p.getFirst().toLocation(loc.getExWorld()).distanceSquared(loc) < RADIUS * RADIUS).findFirst().orElse(null);
+    Portal portal = portals.stream()
+        .filter(p -> p.getWorld().equals(loc.getExWorld())
+                     && p.getFirst().toLocation(loc.getExWorld()).distanceSquared(loc) < RADIUS * RADIUS)
+        .findFirst()
+        .orElse(null);
 
     if (portal != null) {
-      user.teleport(portal.getSecond().toLocation(loc.getExWorld()));
+      return new LocInteractionResult<>(portal, u -> u.teleport(portal.getSecond().toLocation(loc.getExWorld())));
     }
 
-    portal = portals.stream().filter(p -> p.getWorld().equals(loc.getExWorld())
-                                          && p.getSecond().toLocation(loc.getExWorld()).distanceSquared(loc) < RADIUS * RADIUS).findFirst().orElse(null);
+    Portal portal2 = portals.stream()
+        .filter(p -> p.getWorld().equals(loc.getExWorld())
+                     && p.getSecond().toLocation(loc.getExWorld()).distanceSquared(loc) < RADIUS * RADIUS)
+        .findFirst()
+        .orElse(null);
 
-    if (portal != null) {
-      user.teleport(portal.getFirst().toLocation(loc.getExWorld()));
+    if (portal2 != null) {
+      return new LocInteractionResult<>(portal2, u -> u.teleport(portal2.getFirst().toLocation(loc.getExWorld())));
     }
+    return null;
   }
 
   @Override
@@ -137,8 +144,7 @@ public class PortalManager extends MoverManager<Portal> {
       }
 
       if (isFirst) {
-        this.firstPortalByUuid.put(user.getUniqueId(), new Tuple<>(user.getExLocation(),
-            args.get(2).toColorFromHex()));
+        this.firstPortalByUuid.put(user.getUniqueId(), new Tuple<>(user.getExLocation(), args.get(2).toColorFromHex()));
         sender.sendPluginTDMessage("§sSaved first location");
         sender.sendTDMessageCommandHelp("Add second portal", "movers portal add second <hexColor>");
       } else if (this.firstPortalByUuid.containsKey(user.getUniqueId())) {

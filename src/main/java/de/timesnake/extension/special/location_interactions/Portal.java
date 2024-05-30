@@ -2,21 +2,21 @@
  * Copyright (C) 2023 timesnake
  */
 
-package de.timesnake.extension.special.move;
+package de.timesnake.extension.special.location_interactions;
 
-import de.timesnake.basic.bukkit.util.world.ExFacingPosition;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
+import de.timesnake.basic.bukkit.util.world.SimpleFacingLocation;
 import org.bukkit.Color;
 
-public class Portal extends Mover {
+public class Portal extends LocationInteraction {
 
-  private final ExFacingPosition first;
-  private final ExFacingPosition second;
+  private final SimpleFacingLocation first;
+  private final SimpleFacingLocation second;
 
   private final Color firstColor;
   private final Color secondColor;
 
-  public Portal(MoverManager<Portal> manager, ExWorld world, ExFacingPosition first, ExFacingPosition second,
+  public Portal(PortalManager manager, ExWorld world, SimpleFacingLocation first, SimpleFacingLocation second,
                 Color firstColor, Color secondColor) {
     super(manager, world, "portal");
 
@@ -26,11 +26,11 @@ public class Portal extends Mover {
     this.secondColor = secondColor;
   }
 
-  public ExFacingPosition getFirst() {
+  public SimpleFacingLocation getFirst() {
     return first;
   }
 
-  public ExFacingPosition getSecond() {
+  public SimpleFacingLocation getSecond() {
     return second;
   }
 
