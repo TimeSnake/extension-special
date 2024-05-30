@@ -2,23 +2,22 @@
  * Copyright (C) 2023 timesnake
  */
 
-package de.timesnake.extension.special.move;
+package de.timesnake.extension.special.location_interactions;
 
-import de.timesnake.basic.bukkit.util.world.ExPosition;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
+import de.timesnake.basic.bukkit.util.world.SimpleLocation;
 
-public class JumpPad extends Mover {
+public class JumpPad extends LocationInteraction {
 
-  private final ExPosition position;
+  private final SimpleLocation position;
   private final double speed;
   private final double x;
   private final double y;
   private final double z;
 
-  public JumpPad(MoverManager<JumpPad> manager, ExWorld world, ExPosition position, double speed, double x, double y,
+  public JumpPad(JumpPadManager manager, ExWorld world, SimpleLocation position, double speed, double x, double y,
                  double z) {
     super(manager, world, "jump_pad");
-
     this.position = position;
     this.speed = speed;
     this.x = x;
@@ -26,7 +25,7 @@ public class JumpPad extends Mover {
     this.z = z;
   }
 
-  public ExPosition getPosition() {
+  public SimpleLocation getPosition() {
     return position;
   }
 

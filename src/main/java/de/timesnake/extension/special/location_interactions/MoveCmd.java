@@ -2,7 +2,7 @@
  * Copyright (C) 2023 timesnake
  */
 
-package de.timesnake.extension.special.move;
+package de.timesnake.extension.special.location_interactions;
 
 import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
 import de.timesnake.basic.bukkit.util.chat.cmd.CommandListener;
@@ -10,6 +10,7 @@ import de.timesnake.basic.bukkit.util.chat.cmd.Completion;
 import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.extension.special.chat.Plugin;
+import de.timesnake.extension.special.main.ExSpecial;
 import de.timesnake.library.chat.Code;
 import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.commands.PluginCommand;
@@ -49,7 +50,8 @@ public class MoveCmd implements CommandListener {
       }
     };
 
-    boolean successfully = MoversManager.getInstance().handleCommand(sender, user, type, shortArgs);
+    boolean successfully = ExSpecial.getPlugin().getLocationInteractionManager().handleCommand(sender, user, type,
+        shortArgs);
 
     if (!successfully) {
       sender.sendPluginMessage(Component.text("Unknown mover type", ExTextColor.WARNING));

@@ -6,7 +6,6 @@ package de.timesnake.extension.special.display;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
@@ -60,8 +59,7 @@ public class DisplayManager implements Listener {
     if (displaysFile.exists()) {
       GsonFile file = this.newGsonFile(world.getWorldFolder().getAbsolutePath());
 
-      List<Display> displays = file.read(new TypeToken<List<Display>>() {
-      }.getType());
+      List<Display> displays = file.readList(Display.class);
       this.displaysByWorld.put(world, displays);
 
       for (Display display : displays) {

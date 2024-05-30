@@ -5,26 +5,25 @@
 package de.timesnake.extension.special.main;
 
 import de.timesnake.extension.special.display.DisplayManager;
-import de.timesnake.extension.special.move.MoversManager;
+import de.timesnake.extension.special.location_interactions.LocationInteractionManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ExSpecial extends JavaPlugin {
 
   private static ExSpecial plugin;
 
-  private MoversManager moversManager;
+  private LocationInteractionManager locationInteractionManager;
 
   @Override
   public void onEnable() {
     plugin = this;
 
-    this.moversManager = new MoversManager();
+    this.locationInteractionManager = new LocationInteractionManager();
     new DisplayManager();
   }
 
-  @Override
-  public void onDisable() {
-    this.moversManager.onDisable();
+  public LocationInteractionManager getLocationInteractionManager() {
+    return locationInteractionManager;
   }
 
   public static ExSpecial getPlugin() {

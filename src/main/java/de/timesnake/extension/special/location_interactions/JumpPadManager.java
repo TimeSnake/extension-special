@@ -2,7 +2,7 @@
  * Copyright (C) 2023 timesnake
  */
 
-package de.timesnake.extension.special.move;
+package de.timesnake.extension.special.location_interactions;
 
 import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
 import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class JumpPadManager extends MoverManager<JumpPad> {
+public class JumpPadManager extends LocationInteractionManagerBasis<JumpPad> {
 
   public static final String NAME = "jump_pad";
   public static final double RADIUS = 0.7;
@@ -26,8 +26,8 @@ public class JumpPadManager extends MoverManager<JumpPad> {
   }
 
   @Override
-  public void addMover(Mover mover, ExWorld world) {
-    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(((JumpPad) mover));
+  public void addLocInteraction(JumpPad mover, ExWorld world) {
+    this.moversByWorld.computeIfAbsent(world, w -> new HashSet<>()).add(mover);
   }
 
   public Integer addJumpPad(ExLocation loc, double vecX, double vecY, double vecZ, double speed) {
@@ -68,9 +68,9 @@ public class JumpPadManager extends MoverManager<JumpPad> {
 
 
   @Override
-  public void trigger(User user, Trigger type) {
+  public LocInteractionResult<?> trigger(User user, Trigger type) {
     if (!type.equals(Trigger.MOVE)) {
-      return;
+      return null;
     }
 
     ExLocation location = user.getExLocation();
@@ -82,13 +82,16 @@ public class JumpPadManager extends MoverManager<JumpPad> {
           this.getJumpPads(location.getExWorld()).stream()
               .filter(p -> p.getWorld().equals(location.getExWorld())
                            && p.getPosition().toLocation(location.getExWorld()).distanceSquared(location) < RADIUS * RADIUS)
-              .findFirst().orElse(null);
+              .findFirst()
+              .orElse(null);
 
       if (jumpPad != null) {
         double speed = jumpPad.getSpeed();
-        user.setVelocity(new Vector(jumpPad.getX(), jumpPad.getY(), jumpPad.getZ()).normalize().multiply(speed));
+        return new LocInteractionResult<>(jumpPad, u -> u.setVelocity(new Vector(jumpPad.getX(), jumpPad.getY(),
+            jumpPad.getZ()).normalize().multiply(speed)));
       }
     }
+    return null;
   }
 
   @Override

@@ -4,8 +4,8 @@
 
 package de.timesnake.extension.special.display;
 
-import de.timesnake.basic.bukkit.util.world.ExPosition;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
+import de.timesnake.basic.bukkit.util.world.SimpleLocation;
 import de.timesnake.basic.bukkit.util.world.entity.HoloDisplay;
 import de.timesnake.basic.bukkit.util.world.entity.PacketEntity;
 
@@ -15,13 +15,13 @@ import java.util.Objects;
 public class Display {
 
   private final int id;
-  private final ExPosition position;
+  private final SimpleLocation position;
   private final List<String> text;
 
   private transient PacketEntity packetEntity;
   private transient ExWorld world;
 
-  public Display(DisplayManager manager, ExWorld world, ExPosition position, List<String> text) {
+  public Display(DisplayManager manager, ExWorld world, SimpleLocation position, List<String> text) {
     this.id = manager.newId(world);
     this.position = position;
     this.text = text;
@@ -33,7 +33,7 @@ public class Display {
     return id;
   }
 
-  public ExPosition getPosition() {
+  public SimpleLocation getPosition() {
     return position;
   }
 
