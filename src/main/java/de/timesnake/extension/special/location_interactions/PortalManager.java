@@ -210,7 +210,7 @@ public class PortalManager extends LocationInteractionManagerBasis<Portal> {
 
   private void spawnPortalParticles(Location location, Color color) {
     Particle.DustOptions dust = new Particle.DustOptions(color, 2);
-    location.getWorld().spawnParticle(Particle.REDSTONE, location.getX(), location.getY(), location.getZ(),
+    location.getWorld().spawnParticle(Particle.PORTAL, location.getX(), location.getY(), location.getZ(),
         8, 0, 1, 0, 1, dust);
   }
 }
