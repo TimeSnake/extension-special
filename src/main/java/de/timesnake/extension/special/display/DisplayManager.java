@@ -4,8 +4,6 @@
 
 package de.timesnake.extension.special.display;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
@@ -105,14 +103,7 @@ public class DisplayManager implements Listener {
   }
 
   private GsonFile newGsonFile(String folderPath) {
-    return new GsonFile(new File(folderPath + File.separator + FILE_NAME + ".json"), this.newGson());
-  }
-
-  private Gson newGson() {
-    return new GsonBuilder()
-        .serializeNulls()
-        .setPrettyPrinting()
-        .create();
+    return new GsonFile(new File(folderPath + File.separator + FILE_NAME + ".json"));
   }
 
   public @Nullable Integer removeDisplay(ExLocation loc, double range) {
