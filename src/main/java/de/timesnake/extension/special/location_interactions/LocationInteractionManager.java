@@ -14,8 +14,8 @@ import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.basic.bukkit.util.world.ExWorldLoadEvent;
 import de.timesnake.basic.bukkit.util.world.ExWorldUnloadEvent;
 import de.timesnake.basic.bukkit.util.world.WorldManager;
-import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
+import de.timesnake.library.chat.Plugin;
 import de.timesnake.library.commands.simple.Arguments;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +49,7 @@ public class LocationInteractionManager implements Listener {
     Server.registerListener(this, ExSpecial.getPlugin());
 
     Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "movers", List.of("mvs", "mover"),
-        new MoveCmd(), Plugin.SPECIAL);
+        new MoveCmd(), Plugin.SERVER);
   }
 
   private void loadLocInteractionsOfWorld(ExWorld world) {
