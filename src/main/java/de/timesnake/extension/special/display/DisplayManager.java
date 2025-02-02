@@ -8,9 +8,9 @@ import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.basic.bukkit.util.world.ExWorldLoadEvent;
-import de.timesnake.extension.special.chat.Plugin;
 import de.timesnake.extension.special.main.ExSpecial;
 import de.timesnake.library.basic.util.GsonFile;
+import de.timesnake.library.chat.Plugin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.event.EventHandler;
@@ -49,7 +49,7 @@ public class DisplayManager implements Listener {
     Server.registerListener(this, ExSpecial.getPlugin());
 
     Server.getCommandManager().addCommand(ExSpecial.getPlugin(), "holodisplay", List.of("holod"),
-            new DisplayCmd(), Plugin.SPECIAL);
+        new DisplayCmd(), Plugin.SERVER);
   }
 
   private void loadDisplaysOfWorld(ExWorld world) {
