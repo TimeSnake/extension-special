@@ -84,9 +84,9 @@ public class DisplayCmd implements CommandListener {
   public Completion getTabCompletion() {
     return new Completion(this.perm)
         .addArgument(new Completion("add")
-            .addArgument(new Completion("<text>", "<line1>{\\n<nextLine>}")))
+            .addArgument(new Completion("<text>", "<line1>{\\n<nextLine>}").allowAny()))
         .addArgument(new Completion("remove")
-            .addArgument(new Completion("[id]")));
+            .addArgument(new Completion("[id]").allowAny()));
   }
 
   @Override
